@@ -29,7 +29,7 @@ public class SendExample {
 		 */
 		/*
 		set.put("to", "01000000000, 01000000001"); // 받는사람 번호 여러개 입력시
-		set.put("image_path", "../images/"); // image file path 이미지 파일 경로 설정 (기본 "./")
+		set.put("image_path", "./images/"); // image file path 이미지 파일 경로 설정 (기본 "./")
 		set.put("image", "test.jpg"); // image file (지원형식 : 200KB 이하의 JPEG)
 		set.put("refname", "참조내용"); // 참조내용
 		set.put("country", "KR"); // 국가코드 한국:KR 일본:JP 미국:US 중국:CN

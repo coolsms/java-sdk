@@ -17,14 +17,12 @@ import org.json.simple.JSONValue;
  */
 public class Https
 {
-	private String url = "https://api.coolsms.co.kr/sms/1.5/";
-
 	/*
 	 * postRequest (POST)
 	 * @param StringBuffer : data 
 	 * @param String : image
 	 */
-	public JSONObject postRequest(String resource, HashMap<String, String> params) {
+	public JSONObject postRequest(String url_string, HashMap<String, String> params) {
 		JSONObject obj = new JSONObject();
 		try {
 			obj.put("status", false);
@@ -65,7 +63,7 @@ public class Https
 				}
 			}
 			
-			URL url = new URL(this.url + resource);
+			URL url = new URL(url_string);
 			HttpsURLConnection connection = (HttpsURLConnection) url.openConnection(); // connect
 			connection.setDoInput(true);
 			connection.setDoOutput(true);
@@ -107,12 +105,6 @@ public class Https
 			String response = null;
 			String inputLine; 
 			int response_code = connection.getResponseCode();
-
-			obj = checkResponseCode(obj, response_code);
-			if((Boolean) obj.get("status") == false) {
-				return obj;
-			}
-
 			BufferedReader in = null;
 			// response 담기 
 			if (response_code != 200) {
@@ -132,10 +124,6 @@ public class Https
 					obj.put("status", false);
 				}
 			} else {
-				if (resource == "cancel") {
-					obj.put("status", true);
-				   	return obj;
-				}
 				obj.put("status", false);
 				obj.put("message", "response is empty");
 			}
@@ -149,7 +137,7 @@ public class Https
 	/*
 	 * https request (GET)
 	 */
-	public JSONObject request(String resource, HashMap<String, String> params) {
+	public JSONObject request(String url_string, HashMap<String, String> params) {
 		JSONObject obj = new JSONObject();
 		try {
 			obj.put("status", true);
@@ -158,7 +146,7 @@ public class Https
 			String timestamp = getTimestamp();
 			String signature = getSignature(params.get("api_secret"), salt, timestamp); // getSignature
 
-			String data = resource + "?";
+			String data = url_string + "?";
 			data = data + URLEncoder.encode("api_key", charset) + "=" + URLEncoder.encode(params.get("api_key"), charset);
 			data = setGetData(data, "signature", signature, charset);
 			data = setGetData(data, "salt", salt, charset);
@@ -177,20 +165,14 @@ public class Https
 				}
 			}
 
-			URL url = new URL(this.url + data);
-			HttpsURLConnection connection = (HttpsURLConnection) url.openConnection(); // connect			
+			URL url = new URL(data);
+			HttpsURLConnection connection = (HttpsURLConnection) url.openConnection(); // connect
 			connection.setRequestMethod("GET");
 			
 			BufferedReader in = null;
-
-			int response_code = connection.getResponseCode();			
-			obj = checkResponseCode(obj, response_code);
-			if((Boolean) obj.get("status") == false) {
-				return obj;
-			}
-
-			if (response_code != 200) // 오류발생시
-			{
+			int response_code = connection.getResponseCode();
+			if (response_code != 200) {
+				// 오류발생시
 				in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
 			} else {
 				in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -203,7 +185,17 @@ public class Https
 			}
 
 			if (response != null) {
-				obj = (JSONObject) JSONValue.parse(response);
+				// response 가 object 냐 array에 따라 parse를 다르게한다.
+				try {
+					obj = (JSONObject) JSONValue.parse(response);
+				} catch (Exception e) {
+					try {
+						JSONArray reponse_array = (JSONArray) JSONValue.parse(response);
+						obj.put("data", reponse_array);
+					} catch (Exception ex) {
+						obj.put("status", false);
+					}
+				}
 				obj.put("status", true);
 				if (obj.get("code") != null) {
 					obj.put("status", false);
@@ -321,33 +313,5 @@ public class Https
      */
 	public String setValue(String key, String value) {
 		return "Content-Disposition: form-data; name=\"" + key + "\"\r\n\r\n"+ value;
-	}
-
-	/*
-	 * Https ResponseCode Check
-	 */
-	private JSONObject checkResponseCode(JSONObject obj, int response_code) {
-		if(obj.get("status") == null) {
-			obj.put("status", false);
-		}
-		//http connection check
-		switch (response_code) {
-			case HttpsURLConnection.HTTP_OK:
-				obj.put("status", true);
-				break;
-			case HttpsURLConnection.HTTP_FORBIDDEN:
-				obj.put("status", true);
-				break;
-			case HttpsURLConnection.HTTP_GATEWAY_TIMEOUT:
-				obj.put("message", "gateway timeout");
-				break;
-			case HttpsURLConnection.HTTP_UNAVAILABLE:
-				obj.put("message", "unavailable");
-				break;
-			default:
-				obj.put("message", "unknown response code : " + response_code);
-				break;
-		}
-		return obj;
 	}
 }
