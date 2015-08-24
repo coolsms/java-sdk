@@ -19,7 +19,7 @@ public class RegisterExample {
 		 * 관련정보 : http://www.coolsms.co.kr/SenderID_API#POSTregister
 		 */
 		HashMap<String, String> set = new HashMap<String, String>();
-		set.put("phone", "01090683469"); // 등록할 발신번호
+		set.put("phone", "01000000000"); // 등록할 발신번호
 		
 		JSONObject result = coolsms.register(set); // 발신번호 등록요청
 		if ((Boolean) result.get("status") == true) {
