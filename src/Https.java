@@ -72,7 +72,6 @@ public class Https
 			connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
 			connection.setUseCaches(false);
 			DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(connection.getOutputStream()));
-			outputStream.writeUTF(postDataBuilder.toString());
 
 			// image data set
 			if(image != null) {
@@ -82,7 +81,8 @@ public class Https
 				// image file set
 				postDataBuilder.append(setFile("image", image));				
 				postDataBuilder.append("\r\n");
-				FileInputStream fileStream = new FileInputStream(image_path + image);				
+				FileInputStream fileStream = new FileInputStream(image_path + image);
+				outputStream.writeUTF(postDataBuilder.toString());
 				
 				// 파일전송 작업 시작
 				int maxBufferSize = 1024;
@@ -97,7 +97,9 @@ public class Https
 					byteRead = fileStream.read(buffer, 0, bufferSize);
 				}
 				fileStream.close();
-			} 
+			} else {
+				outputStream.writeUTF(postDataBuilder.toString());
+			}
 			outputStream.writeBytes(delimiter); 
 			outputStream.flush();
 			outputStream.close();

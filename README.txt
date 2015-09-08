@@ -1,9 +1,9 @@
-REST API SDK for JAVA  
+﻿REST API SDK for JAVA  
 =====================
 
-Version : 2.0
+Version : 2.1
 
-Registration date : 2015-07-01
+Registration date : 2015-09-08
 
 Infomation : REST-JAVA는 REST-API개념을 사용하여 보다 쉽고 빠르게 문자서비스를 전송할 수 있는 SDK입니다.
 
