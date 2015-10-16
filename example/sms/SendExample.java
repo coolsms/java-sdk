@@ -19,8 +19,10 @@ public class SendExample {
 		 * 관련정보 : http://www.coolsms.co.kr/SDK_Java_API_Reference_ko#toc-0
 		 */
 		HashMap<String, String> set = new HashMap<String, String>();
-		set.put("to", "010000000000"); // 받는사람 번호
-		set.put("from", "029302266"); // 보내는사람 번호
+		set.put("to", "010000000000"); // 수신번호
+
+		// 10월 16일 이후로 발신번호 사전등록제로 인해 등록된 발신번호로만 문자를 보내실 수 있습니다.
+		set.put("from", "029302266"); // 발신번호
 		set.put("text", "Test Message"); // 문자내용
 		set.put("type", "sms"); // 문자 타입
 

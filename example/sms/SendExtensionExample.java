@@ -23,11 +23,14 @@ public class SendExtensionExample {
 		JSONArray list = new JSONArray();
 		
 		obj.put("type", "sms"); // 문자타입
-		obj.put("to", "01000000000, 01000000001"); // 받는사람번호
+		obj.put("to", "01000000000, 01000000001"); // 수신번호
 		obj.put("text", "Test Message"); // 문자내용
 			
 		list.add(obj); // 원하는 만큼 obj를 넣어주면 됩니다.		
 		set.put("extension", list.toString()); // set extension
+
+		// 10월 16일 이후로 발신번호 사전등록제로 인해 등록된 발신번호로만 문자를 보내실 수 있습니다.
+		set.put("from", "029302266"); // 발신번호
 		
 		JSONObject result = coolsms.send(set); // 보내기&전송결과받기
 		if ((Boolean) result.get("status") == true) {
