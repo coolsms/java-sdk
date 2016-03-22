@@ -1,69 +1,116 @@
+package com.nurigo.java_sdk;
+
 import java.io.*;
 import java.net.URL;
 import java.net.URLEncoder;
+
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
+
+import java.util.Properties;
 import java.util.Random;
 import java.util.HashMap;
 import java.util.Map.Entry;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-/*
- * Https.class
- * Https request, response를 관리하는 class 입니다.
+/**
+ * @mainpage JAVA SDK
+ * @section intro 소개
+ *     - 소개 : Coolsms REST API 
+ *     - 버전 : 2.0
+ *     - 설명 : Coolsms REST API 를 이용 보다 빠르고 안전하게 문자메시지를 보낼 수 있는 JAVA로 만들어진 SDK 입니다.
+ * @section CreateInfo 작성 정보
+ *     - 작성자 : Nurigo
+ *     - 작성일 : 2015/03/18 * 
+ * @section common 기타 정보
+ *     - 저작권 GPL v2
  */
-public class Https
-{
-	/*
-	 * postRequest (POST)
-	 * @param StringBuffer : data 
-	 * @param String : image
+
+/**
+ * @class Coolsms
+ * @brief Coolsms Rest API core class, using the Rest API
+ */
+public class Coolsms {
+	
+	final String URL = "https://api.coolsms.co.kr";
+	final String SDK_VERSION = "1.0";
+	
+	/** api name & api version */
+	private String api_name = "sms";
+	private String api_version = "1.5";
+	
+	/** need for authentication  */
+	private String salt;
+	private String timestamp;
+	private String signature;
+	private String api_key;
+	private String api_secret;		
+	
+	/**
+	 * @brief set api_key, api_secret
+	 * @param string api_key [required]
+	 * @param string api_secret [required]
 	 */
-	public JSONObject postRequest(String url_string, HashMap<String, String> params) {
-		JSONObject obj = new JSONObject();
-		try {
-			obj.put("status", false);
-
-			String salt = salt();
-			String timestamp = getTimestamp();
-			String signature = getSignature(params.get("api_secret"), salt, timestamp); 
-			String boundary = salt + timestamp;
-			String delimiter = "\r\n--" + boundary + "\r\n";
-
-			params.put("salt", salt);
-			params.put("signature", signature);
-			params.put("timestamp", timestamp);
-
-			// data 생성 및 데이터 구분을 위한 delimiter 설정
-			StringBuffer postDataBuilder = new StringBuffer();
-			postDataBuilder.append(delimiter);
-
-			// params에 image가 있으면 변수에 담아 request를 다르게 보낸다
-			String image = null;
-			String image_path = null;
-			for (Entry<String, String> entry : params.entrySet()) {
-				String key = entry.getKey();
-				String value = entry.getValue();
-				
-				if (key == "image") {
-					image = value;
-					continue;
-				}				
-				if (key == "image_path") {
-					image_path = value;
-					continue;
-				}				
-				postDataBuilder = setPostData(postDataBuilder, key, value, delimiter);
-				if(postDataBuilder == null) {
-					obj.put("message", "postRequest data build fail");
-				   	return obj;
-				}
-			}
+	public Coolsms(String api_key, String api_secret) {
+		// disable SNI. Java 1.7 bug
+		System.setProperty("jsse.enableSNIExtension", "false") ;
+		this.api_key = api_key;
+		this.api_secret = api_secret;
+	}
+	
+	/**
+	 * @brief postRequest (POST)
+	 * @param string resource [required]
+	 * @param hashmap<string, string> params [required]
+	 * @return jsonObject
+	 */
+	public JSONObject postRequest(String resource, HashMap<String, String> params) {
+		JSONObject obj = new JSONObject();	
+		
+		// set base info
+		params = setBaseInfo(params);
 			
-			URL url = new URL(url_string);
+		String boundary = this.salt + this.timestamp;
+		String delimiter = "\r\n--" + boundary + "\r\n";
+
+		// data 생성 및 데이터 구분을 위한 delimiter 설정
+		StringBuffer postDataBuilder = new StringBuffer();
+		postDataBuilder.append(delimiter);
+
+		// params에 image가 있으면 변수에 담아 request를 다르게 보낸다
+		String image = null;
+		String image_path = "./";
+		
+		if (params.get("image") != null) {
+			image = params.get("image");
+			params.remove("image");			
+		}
+		
+		if (params.get("image_path") != null) {
+			image_path = params.get("image_path");
+			params.remove("image_path");
+		}
+		
+			
+		// params data 를 StringBuffer로 재배열 시킨다.
+		for (Entry<String, String> entry : params.entrySet()) {
+			String key = entry.getKey();
+			String value = entry.getValue();
+			
+			postDataBuilder = setPostData(postDataBuilder, key, value, delimiter);
+			if (postDataBuilder == null) {
+				obj.put("message", "postRequest data build fail");
+			   	return obj;
+			}
+		}
+		
+		// start https connection
+		try {
+			URL url = new URL(getResourceUrl(resource));
 			HttpsURLConnection connection = (HttpsURLConnection) url.openConnection(); // connect
 			connection.setDoInput(true);
 			connection.setDoOutput(true);
@@ -75,13 +122,12 @@ public class Https
 
 			// image data set
 			if(image != null) {
-				// MMS Setting
-				if(image_path == null) image_path = "./";
-				
+				System.out.println(image);
+				System.out.println(image_path);
 				// image file set
 				postDataBuilder.append(setFile("image", image));				
 				postDataBuilder.append("\r\n");
-				FileInputStream fileStream = new FileInputStream(image_path + image);
+				FileInputStream fileStream = new FileInputStream(image_path + image);				
 				outputStream.writeUTF(postDataBuilder.toString());
 				
 				// 파일전송 작업 시작
@@ -100,6 +146,7 @@ public class Https
 			} else {
 				outputStream.writeUTF(postDataBuilder.toString());
 			}
+			
 			outputStream.writeBytes(delimiter); 
 			outputStream.flush();
 			outputStream.close();
@@ -133,32 +180,47 @@ public class Https
 			obj.put("status", false);
 			obj.put("message", e.toString());
 		}
+		
 		return obj;
+	}	
+
+	/**
+	 * @brief return resource url from api.coolsms.co.kr
+	 * @param string resource [required]
+	 * @return string
+	 */
+	private String getResourceUrl(String resource) {		
+		String resource_url = String.format("%s/%s/%s/%s", this.URL, this.api_name, this.api_version, resource);		
+		return resource_url;
 	}
 
-	/*
-	 * https request (GET)
+	/**
+	 * @brief https request ( GET )
+	 * @param string resource [required]
+	 * @param hashmap<string, string> params [required]
+	 * @return jsonObject
 	 */
-	public JSONObject request(String url_string, HashMap<String, String> params) {
+	public JSONObject request(String resource, HashMap<String, String> params) {
 		JSONObject obj = new JSONObject();
 		try {
+			// set base info
+			params = setBaseInfo(params);
 			obj.put("status", true);
-			String charset = "UTF8";
-			String salt = salt();
-			String timestamp = getTimestamp();
-			String signature = getSignature(params.get("api_secret"), salt, timestamp); // getSignature
+			String charset = "UTF8";			
+			String data = getResourceUrl(resource) + "?";
+			data = data + URLEncoder.encode("api_key", charset) + "=" + URLEncoder.encode(this.api_key, charset);
+						
+			// remove api_secret
+			params.remove("api_secret");		
 
-			String data = url_string + "?";
-			data = data + URLEncoder.encode("api_key", charset) + "=" + URLEncoder.encode(params.get("api_key"), charset);
-			data = setGetData(data, "signature", signature, charset);
-			data = setGetData(data, "salt", salt, charset);
-			data = setGetData(data, "timestamp", timestamp, charset);
-
-			params.remove("api_secret");
-
-			for (Entry<String, String> entry : params.entrySet()) {
+			// set contents
+			for (Entry<String, String> entry : params.entrySet()) {				
 				String key = entry.getKey();
 				String value = entry.getValue();
+				
+				// api_key 는 위에서 넣어줬기 때문에 continue
+				if (key == "api_key") continue;
+				
 				data = setGetData(data, key, value, charset);
 				if(data == null) {
 					obj.put("status", false);
@@ -168,7 +230,7 @@ public class Https
 			}
 
 			URL url = new URL(data);
-			HttpsURLConnection connection = (HttpsURLConnection) url.openConnection(); // connect
+			HttpsURLConnection connection = (HttpsURLConnection) url.openConnection(); 
 			connection.setRequestMethod("GET");
 			
 			BufferedReader in = null;
@@ -212,11 +274,34 @@ public class Https
 		}
 		return obj;
 	}
+	
+	/**	 
+	 * @brief set base info
+	 * @param hashmap<string, string> params [required]
+	 * @return 
+	 */
+	private HashMap<String, String> setBaseInfo(HashMap<String, String> params) {
+		Properties properties = System.getProperties();
+		
+		this.salt = salt();
+		this.timestamp = getTimestamp();
+		this.signature = getSignature(this.api_secret, salt, timestamp); // getSignature
+		
+		params.put("api_key", this.api_key);
+		params.put("salt", this.salt);
+		params.put("signature", this.signature);
+		params.put("timestamp", this.timestamp);		
+		params.put("os_platform", properties.getProperty("os.name"));
+		params.put("dev_lang", "JAVA " + properties.getProperty("java.version"));
+		params.put("sdk_version", "JAVA SDK " + this.SDK_VERSION);
+		return params;
+	}
 
-	/*
-     * 업로드할 파일에 대한 메타 데이터를 설정한다.
-     * @param key : 서버에서 사용할 파일 변수명
-     * @param fileName : 서버에서 저장될 파일명
+	/**
+     * @brief 업로드할 파일에 대한 메타 데이터를 설정한다.
+     * @param string key [required] 서버에서 사용할 파일 변수명
+     * @param string fileName [required] 서버에서 저장될 파일명
+     * @return string
      */
 	public String setFile(String key, String fileName) {
 		return "Content-Disposition: form-data; name=\"" + key
@@ -224,8 +309,13 @@ public class Https
 				+ "\"\r\nContent-type: image/jpeg;\r\n";
 	}
 
-	/*
-	 * String을 POST 형식에 맞게 Input 
+	/**
+	 * @brief string data를 http method POST 방식 data로 변경
+	 * @param stringbuffer builder [required]
+	 * @param string key [required] 
+	 * @param string value [required]
+	 * @param string delimiter [required]
+	 * @return stringbuffer
 	 */
 	public StringBuffer setPostData(StringBuffer builder, String key, String value, String delimiter) {
 		try {
@@ -238,8 +328,13 @@ public class Https
 		return builder;
 	}
 
-	/*
-	 * String을 GET 방식으로 변경
+	/**
+	 * @brief string data를 http method GET 방식 data로 변경
+	 * @param string data [required]
+	 * @param string key [required]
+	 * @param string value [required]
+	 * @param string charSet [required]
+	 * @return string
 	 */
 	public String setGetData(String data, String key, String value, String charSet) {
 		try {
@@ -250,12 +345,12 @@ public class Https
 		} catch(Exception e) {
 			return null;
 		}
-
 		return data;
 	}
 
-	/*
-	 * Get salt
+	/**
+	 * @brief get salt data
+	 * @return string
 	 */
 	public String salt() {
 		String uniqId = "";
@@ -266,12 +361,14 @@ public class Https
 			int randomInt = randomGenerator.nextInt(10); // digit range from 0 - 9
 			uniqId += randomInt + "";
 		}
-
 		return uniqId;
 	}
 
-	/*
-	 * Get signature
+	/**
+	 * @brief get signature
+	 * @param string api_secret [required]
+	 * @param string timestamp [required]
+	 * @return string
 	 */
 	public String getSignature(String api_secret, String salt, String timestamp) {
 		String signature = "";
@@ -295,12 +392,12 @@ public class Https
 		} catch (Exception e) {
 			signature = e.getMessage();
 		}
-
 		return signature;
 	}
 
-	/*
-	 * Get timestamp
+	/**
+	 * @brief get timestamp
+	 * @return string
 	 */
 	public String getTimestamp() {
 		long timestamp_long = System.currentTimeMillis() / 1000;
@@ -308,10 +405,10 @@ public class Https
 		return timestamp;
 	}
 
-	/*
-     * Map 형식으로 Key와 Value를 셋팅한다.
-     * @param key : 서버에서 사용할 변수명
-     * @param value : 변수명에 해당하는 실제 값
+	/**
+     * @brief map 형식으로 key와 value를 셋팅한다.
+     * @param string key [required] 서버에서 사용할 변수명
+     * @param string value [required] 변수명에 해당하는 실제 값
      */
 	public String setValue(String key, String value) {
 		return "Content-Disposition: form-data; name=\"" + key + "\"\r\n\r\n"+ value;
