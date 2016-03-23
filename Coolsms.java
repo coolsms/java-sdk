@@ -136,28 +136,11 @@ public class Coolsms {
 		outputStream.flush();
 		outputStream.close();
 
-		String response = null;
-		String inputLine = null;		
-		BufferedReader in = null;
-		JSONObject obj = new JSONObject();		
-		int response_code = connection.getResponseCode();
-		
-		if (response_code != 200) {
-			// if response code is 200, throw CoolsmsServerException
-			in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));				
-			obj = (JSONObject) JSONValue.parse(in.readLine());
-			throw new CoolsmsServerException(obj.get("message").toString(), response_code);			
-		} else {
-			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-		}
-
-		while ((inputLine = in.readLine()) != null) {					
-			response = inputLine;
-		}
-
-		obj = (JSONObject) JSONValue.parse(response);	
+		// get response data
+		String response =getHttpsResponse(connection); 
+		JSONObject obj = (JSONObject) JSONValue.parse(response);	
 		return obj;
-	}	
+	}		
 
 	/**
 	 * @brief https request ( GET )
@@ -193,26 +176,11 @@ public class Coolsms {
 
 		URL url = new URL(data);
 		HttpsURLConnection connection = (HttpsURLConnection) url.openConnection(); 
-		connection.setRequestMethod("GET");
-
-		BufferedReader in = null;
-		JSONObject obj = new JSONObject();
-		int response_code = connection.getResponseCode();		
+		connection.setRequestMethod("GET");		
 		
-		if (response_code != 200) {
-			// if response code is 200, throw CoolsmsServerException			
-			in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));				
-			obj = (JSONObject) JSONValue.parse(in.readLine());
-			throw new CoolsmsServerException(obj.get("message").toString(), response_code);	
-		} else {
-			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-		}
-
-		String response = null;
-		String inputLine = null;
-		while ((inputLine = in.readLine()) != null) {
-			response = inputLine;
-		}
+		// get response data
+		String response = getHttpsResponse(connection);
+		JSONObject obj = new JSONObject();
 		
 		// response 가 object 냐 array에 따라 parse를 다르게한다.
 		try {
@@ -364,6 +332,36 @@ public class Coolsms {
 		long timestamp_long = System.currentTimeMillis() / 1000;
 		String timestamp = Long.toString(timestamp_long);
 		return timestamp;
+	}
+	
+	/**
+	 * @brief get https response
+	 * @param httpurlconnection api_key [required]
+	 * @return string
+	 * @throws IOException 
+	 * @throws CoolsmsServerException 
+	 */	
+	public String getHttpsResponse(HttpsURLConnection connection) throws IOException, CoolsmsServerException {
+		String response = null;
+		String inputLine = null;		
+		BufferedReader in = null;
+		JSONObject obj = new JSONObject();		
+		int response_code = connection.getResponseCode();
+		
+		if (response_code != 200) {
+			// if response code is 200, throw CoolsmsServerException
+			in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));				
+			obj = (JSONObject) JSONValue.parse(in.readLine());
+			throw new CoolsmsServerException(obj.get("message").toString(), response_code);			
+		} else {
+			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		}
+		
+		while ((inputLine = in.readLine()) != null) {					
+			response = inputLine;
+		}
+		
+		return response;
 	}
 	
 	/**
