@@ -35,7 +35,7 @@ import org.json.simple.JSONValue;
  * @brief Coolsms Rest API core class, using the Rest API
  */
 public class Coolsms {
-	
+	/** base resource url & sdk_version */
 	final String URL = "https://api.coolsms.co.kr";
 	final String SDK_VERSION = "1.0";
 	
@@ -69,34 +69,32 @@ public class Coolsms {
 	 * @return jsonObject
 	 */
 	public JSONObject postRequest(String resource, HashMap<String, String> params) {
-		JSONObject obj = new JSONObject();	
+		JSONObject obj = new JSONObject();
 		
 		// set base info
 		params = setBaseInfo(params);
-			
+		
+		// create delimiter
 		String boundary = this.salt + this.timestamp;
 		String delimiter = "\r\n--" + boundary + "\r\n";
 
-		// data 생성 및 데이터 구분을 위한 delimiter 설정
+		// create stringbuffer and append delimiter
 		StringBuffer postDataBuilder = new StringBuffer();
 		postDataBuilder.append(delimiter);
 
-		// params에 image가 있으면 변수에 담아 request를 다르게 보낸다
+		// image, image_path will pass in a different way 
 		String image = null;
-		String image_path = "./";
-		
+		String image_path = "./";	
 		if (params.get("image") != null) {
 			image = params.get("image");
 			params.remove("image");			
-		}
-		
+		}		
 		if (params.get("image_path") != null) {
 			image_path = params.get("image_path");
 			params.remove("image_path");
-		}
-		
+		}	
 			
-		// params data 를 StringBuffer로 재배열 시킨다.
+		// set contents
 		for (Entry<String, String> entry : params.entrySet()) {
 			String key = entry.getKey();
 			String value = entry.getValue();
@@ -120,23 +118,21 @@ public class Coolsms {
 			connection.setUseCaches(false);
 			DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(connection.getOutputStream()));
 
-			// image data set
+			// set image data 
 			if(image != null) {
 				System.out.println(image);
 				System.out.println(image_path);
-				// image file set
+				// set image file 
 				postDataBuilder.append(setFile("image", image));				
 				postDataBuilder.append("\r\n");
 				FileInputStream fileStream = new FileInputStream(image_path + image);				
 				outputStream.writeUTF(postDataBuilder.toString());
 				
-				// 파일전송 작업 시작
+				// add an image file to the buffer
 				int maxBufferSize = 1024;
 				int bufferSize = Math.min(fileStream.available(), maxBufferSize);
 				byte[] buffer = new byte[bufferSize];
-				// 버퍼 크기만큼 파일로부터 바이트 데이터를 읽는다
 				int byteRead = fileStream.read(buffer, 0, bufferSize);
-				// 전송
 				while (byteRead > 0) {
 					outputStream.write(buffer);
 					bufferSize = Math.min(fileStream.available(), maxBufferSize);
@@ -155,7 +151,8 @@ public class Coolsms {
 			String inputLine; 
 			int response_code = connection.getResponseCode();
 			BufferedReader in = null;
-			// response 담기 
+			
+			// set response data 
 			if (response_code != 200) {
 				in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
 			} else {
@@ -183,16 +180,6 @@ public class Coolsms {
 		
 		return obj;
 	}	
-
-	/**
-	 * @brief return resource url from api.coolsms.co.kr
-	 * @param string resource [required]
-	 * @return string
-	 */
-	private String getResourceUrl(String resource) {		
-		String resource_url = String.format("%s/%s/%s/%s", this.URL, this.api_name, this.api_version, resource);		
-		return resource_url;
-	}
 
 	/**
 	 * @brief https request ( GET )
@@ -347,21 +334,24 @@ public class Coolsms {
 		}
 		return data;
 	}
-
+	
 	/**
-	 * @brief get salt data
+     * @brief map 형식으로 key와 value를 셋팅한다.
+     * @param string key [required] 서버에서 사용할 변수명
+     * @param string value [required] 변수명에 해당하는 실제 값
+     */
+	public String setValue(String key, String value) {
+		return "Content-Disposition: form-data; name=\"" + key + "\"\r\n\r\n"+ value;
+	}
+	
+	/**
+	 * @brief return resource url from api.coolsms.co.kr
+	 * @param string resource [required]
 	 * @return string
 	 */
-	public String salt() {
-		String uniqId = "";
-		Random randomGenerator = new Random();
-
-		// length - set the unique Id length
-		for (int length = 1; length <= 10; ++length) {
-			int randomInt = randomGenerator.nextInt(10); // digit range from 0 - 9
-			uniqId += randomInt + "";
-		}
-		return uniqId;
+	private String getResourceUrl(String resource) {		
+		String resource_url = String.format("%s/%s/%s/%s", this.URL, this.api_name, this.api_version, resource);		
+		return resource_url;
 	}
 
 	/**
@@ -404,13 +394,20 @@ public class Coolsms {
 		String timestamp = Long.toString(timestamp_long);
 		return timestamp;
 	}
-
+	
 	/**
-     * @brief map 형식으로 key와 value를 셋팅한다.
-     * @param string key [required] 서버에서 사용할 변수명
-     * @param string value [required] 변수명에 해당하는 실제 값
-     */
-	public String setValue(String key, String value) {
-		return "Content-Disposition: form-data; name=\"" + key + "\"\r\n\r\n"+ value;
+	 * @brief get salt data
+	 * @return string
+	 */
+	public String salt() {
+		String uniqId = "";
+		Random randomGenerator = new Random();
+
+		// length - set the unique Id length
+		for (int length = 1; length <= 10; ++length) {
+			int randomInt = randomGenerator.nextInt(10); // digit range from 0 - 9
+			uniqId += randomInt + "";
+		}
+		return uniqId;
 	}
 }
