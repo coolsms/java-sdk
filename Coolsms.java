@@ -233,8 +233,9 @@ public class Coolsms {
 	 * @brief set base info
 	 * @param hashmap<string, string> params [required]
 	 * @return 
+	 * @throws CoolsmsException 
 	 */
-	private HashMap<String, String> setBaseInfo(HashMap<String, String> params) {
+	private HashMap<String, String> setBaseInfo(HashMap<String, String> params) throws CoolsmsException {
 		Properties properties = System.getProperties();
 		
 		this.salt = salt();
