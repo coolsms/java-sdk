@@ -10,5 +10,9 @@ public class CoolsmsException extends Exception {
 	
 	public int getCode() {
 		return this.code;
-	}	
+	}
+	
+	public String toString() {
+		return "Message : " + this.getMessage() + " Code : " + this.code;
+	}
 }

@@ -1,5 +1,6 @@
 package net.nurigo.java_sdk.api;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 import net.nurigo.java_sdk.Coolsms;
@@ -17,8 +18,9 @@ public class Message extends Coolsms {
 	 * @param hashmap<string, string> set
 	 * @return JSONobject
 	 * @throws CoolsmsException
+	 * @throws IOException 
 	 */
-	public JSONObject send(HashMap<String, String> params)  throws CoolsmsException{
+	public JSONObject send(HashMap<String, String> params)  throws CoolsmsException, IOException{
 		return postRequest("send", params);		
 	}
 	
@@ -27,8 +29,9 @@ public class Message extends Coolsms {
 	 * @param hashmap<string, string> set
 	 * @return JSONobject
 	 * @throws CoolsmsException 
+	 * @throws IOException 
 	 */
-	public JSONObject sent(HashMap<String, String> params) throws CoolsmsException {		
+	public JSONObject sent(HashMap<String, String> params) throws CoolsmsException, IOException {		
 		return request("sent", params);		
 	}
 
@@ -37,8 +40,9 @@ public class Message extends Coolsms {
 	 * @param hashmap<string, string> set
 	 * @return JSONobject
 	 * @throws CoolsmsException 
+	 * @throws IOException 
 	 */
-	public JSONObject cancel(HashMap<String, String> params) throws CoolsmsException {
+	public JSONObject cancel(HashMap<String, String> params) throws CoolsmsException, IOException {
 		return postRequest("cancel", params);		
 	}
 
@@ -47,8 +51,9 @@ public class Message extends Coolsms {
 	 * @param hashmap<string, string> set
 	 * @return JSONobject
 	 * @throws CoolsmsException 
+	 * @throws IOException 
 	 */
-	public JSONObject balance() throws CoolsmsException {		
+	public JSONObject balance() throws CoolsmsException, IOException {		
 		// resource 'balance' does not required params so hand over empty params.
 		HashMap<String, String> params = new HashMap<String, String>();
 		return request("balance", params);

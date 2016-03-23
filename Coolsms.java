@@ -15,6 +15,8 @@ import java.util.Map.Entry;
 
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
 import net.nurigo.java_sdk.exceptions.CoolsmsSDKException;
+import net.nurigo.java_sdk.exceptions.CoolsmsServerException;
+import net.nurigo.java_sdk.exceptions.CoolsmsSystemException;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -71,10 +73,9 @@ public class Coolsms {
 	 * @param hashmap<string, string> params [required]
 	 * @return JSONObject
 	 * @throws CoolsmsException 
+	 * @throws IOException 
 	 */
-	public JSONObject postRequest(String resource, HashMap<String, String> params) throws CoolsmsException {
-		JSONObject obj = new JSONObject();
-		
+	public JSONObject postRequest(String resource, HashMap<String, String> params) throws CoolsmsException, IOException {		
 		// set base info		
 		params = setBaseInfo(params);		
 		
@@ -92,86 +93,69 @@ public class Coolsms {
 			String value = entry.getValue();
 			
 			// if key is image. continue
-			if (key == "image") continue;
-			
+			if (key == "image") continue;	
 			postDataBuilder = setPostData(postDataBuilder, key, value, delimiter);
-			if (postDataBuilder == null) {
-				obj.put("message", "postRequest data build fail");
-			   	return obj;
-			}
 		}
 		
-		// start https connection
-		try {
-			URL url = new URL(getResourceUrl(resource));
-			HttpsURLConnection connection = (HttpsURLConnection) url.openConnection(); // connect
-			connection.setDoInput(true);
-			connection.setDoOutput(true);
-			connection.setRequestMethod("POST");
-			connection.setRequestProperty("Connection", "Keep-Alive");
-			connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
-			connection.setUseCaches(false);
-			DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(connection.getOutputStream()));
+		// start https connection	
+		URL url = new URL(getResourceUrl(resource));
+		HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+		connection.setDoInput(true);
+		connection.setDoOutput(true);
+		connection.setRequestMethod("POST");
+		connection.setRequestProperty("Connection", "Keep-Alive");
+		connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+		connection.setUseCaches(false);
+		DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(connection.getOutputStream()));
 
-			// set image data 
-			if(params.get("image") != null) {
-				// set image file 
-				postDataBuilder.append(setFile("image", params.get("image")));	
-				postDataBuilder.append("\r\n");				
-				
-				FileInputStream fileStream = new FileInputStream(params.get("image"));
-				outputStream.writeUTF(postDataBuilder.toString());
-				
-				// add an image file to the buffer
-				int maxBufferSize = 1024;
-				int bufferSize = Math.min(fileStream.available(), maxBufferSize);
-				byte[] buffer = new byte[bufferSize];
-				int byteRead = fileStream.read(buffer, 0, bufferSize);
-				while (byteRead > 0) {
-					outputStream.write(buffer);
-					bufferSize = Math.min(fileStream.available(), maxBufferSize);
-					byteRead = fileStream.read(buffer, 0, bufferSize);
-				}
-				fileStream.close();				
-			} else {
-				outputStream.writeUTF(postDataBuilder.toString());
-			}
-			
-			outputStream.writeBytes(delimiter); 
-			outputStream.flush();
-			outputStream.close();
+		// set image data 
+		if(params.get("image") != null) {
+			// set image file 
+			postDataBuilder.append(setFile("image", params.get("image")));	
+			postDataBuilder.append("\r\n");				
 
-			String response = null;
-			String inputLine = null; 
-			int response_code = connection.getResponseCode();
-			BufferedReader in = null;
-			
-			// set response data 
-			if (response_code != 200) {
-				in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-			} else {
-				in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			}
+			FileInputStream fileStream = new FileInputStream(params.get("image"));
+			outputStream.writeUTF(postDataBuilder.toString());
 
-			while ((inputLine = in.readLine()) != null) {					
-				response = inputLine;
+			// add an image file to the buffer
+			int maxBufferSize = 1024;
+			int bufferSize = Math.min(fileStream.available(), maxBufferSize);
+			byte[] buffer = new byte[bufferSize];
+			int byteRead = fileStream.read(buffer, 0, bufferSize);
+			while (byteRead > 0) {
+				outputStream.write(buffer);
+				bufferSize = Math.min(fileStream.available(), maxBufferSize);
+				byteRead = fileStream.read(buffer, 0, bufferSize);
 			}
-
-			if (response != null) {
-				obj = (JSONObject) JSONValue.parse(response);
-				obj.put("status", true);
-				if (obj.get("code") != null) {
-					obj.put("status", false);
-				}
-			} else {
-				obj.put("status", false);
-				obj.put("message", "response is empty");			
-			}
-		} catch (Exception e) {
-			obj.put("status", false);
-			obj.put("message", e.toString());
+			fileStream.close();
+		} else {
+			outputStream.writeUTF(postDataBuilder.toString());
 		}
+
+		outputStream.writeBytes(delimiter); 
+		outputStream.flush();
+		outputStream.close();
+
+		String response = null;
+		String inputLine = null;		
+		BufferedReader in = null;
+		JSONObject obj = new JSONObject();		
+		int response_code = connection.getResponseCode();
 		
+		if (response_code != 200) {
+			// if response code is 200, throw CoolsmsServerException
+			in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));				
+			obj = (JSONObject) JSONValue.parse(in.readLine());
+			throw new CoolsmsServerException(obj.get("message").toString(), response_code);			
+		} else {
+			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		}
+
+		while ((inputLine = in.readLine()) != null) {					
+			response = inputLine;
+		}
+
+		obj = (JSONObject) JSONValue.parse(response);	
 		return obj;
 	}	
 
@@ -181,79 +165,67 @@ public class Coolsms {
 	 * @param hashmap<string, string> params [required]
 	 * @return JSONObject
 	 * @throws CoolsmsException 
+	 * @throws IOException 
 	 */
-	public JSONObject request(String resource, HashMap<String, String> params) throws CoolsmsException {			
-		JSONObject obj = new JSONObject();
-		try {
-			// set base info
-			params = setBaseInfo(params);
-			obj.put("status", true);
-			String charset = "UTF8";			
-			String data = getResourceUrl(resource) + "?";
-			data = data + URLEncoder.encode("api_key", charset) + "=" + URLEncoder.encode(this.api_key, charset);
-						
-			// remove api_secret
-			params.remove("api_secret");		
+	public JSONObject request(String resource, HashMap<String, String> params) throws CoolsmsException, IOException {		
+		// set base info
+		params = setBaseInfo(params);		
+		String charset = "UTF8";			
+		String data = getResourceUrl(resource) + "?";
+		data = data + URLEncoder.encode("api_key", charset) + "=" + URLEncoder.encode(this.api_key, charset);
 
-			// set contents
-			for (Entry<String, String> entry : params.entrySet()) {				
-				String key = entry.getKey();
-				String value = entry.getValue();
-				
-				// api_key 는 위에서 넣어줬기 때문에 continue
-				if (key == "api_key") continue;
-				
-				data = setGetData(data, key, value, charset);
-				if(data == null) {
-					obj.put("status", false);
-					obj.put("message", "request data build fail");
-				   	return obj;
-				}
-			}
+		// remove api_secret
+		params.remove("api_secret");		
 
-			URL url = new URL(data);
-			HttpsURLConnection connection = (HttpsURLConnection) url.openConnection(); 
-			connection.setRequestMethod("GET");
-			
-			BufferedReader in = null;
-			int response_code = connection.getResponseCode();
-			if (response_code != 200) {
-				// 오류발생시
-				in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-			} else {
-				in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			}
+		// set contents
+		for (Entry<String, String> entry : params.entrySet()) {				
+			String key = entry.getKey();
+			String value = entry.getValue();
 
-			String response = null;
-			String inputLine; // 서버로 부터 받은 response를 받을 변수
-			while ((inputLine = in.readLine()) != null) {
-				response = inputLine;
-			}
+			// api_key 는 위에서 넣어줬기 때문에 continue
+			if (key == "api_key") continue;
 
-			if (response != null) {
-				// response 가 object 냐 array에 따라 parse를 다르게한다.
-				try {
-					obj = (JSONObject) JSONValue.parse(response);
-				} catch (Exception e) {
-					try {
-						JSONArray reponse_array = (JSONArray) JSONValue.parse(response);
-						obj.put("data", reponse_array);
-					} catch (Exception ex) {
-						obj.put("status", false);
-					}
-				}
-				obj.put("status", true);
-				if (obj.get("code") != null) {
-					obj.put("status", false);
-				}
-			} else {
-				obj.put("status", false);
-				obj.put("message", "response is empty");
+			data = setGetData(data, key, value, charset);
+			if(data == null) {
+				throw new CoolsmsSDKException("params is something wrong.", 201);				
 			}
-		} catch (Exception e) {
-			obj.put("status", false);
-			obj.put("message", e.toString());
 		}
+
+		URL url = new URL(data);
+		HttpsURLConnection connection = (HttpsURLConnection) url.openConnection(); 
+		connection.setRequestMethod("GET");
+
+		BufferedReader in = null;
+		JSONObject obj = new JSONObject();
+		int response_code = connection.getResponseCode();		
+		
+		if (response_code != 200) {
+			// if response code is 200, throw CoolsmsServerException			
+			in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));				
+			obj = (JSONObject) JSONValue.parse(in.readLine());
+			throw new CoolsmsServerException(obj.get("message").toString(), response_code);	
+		} else {
+			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		}
+
+		String response = null;
+		String inputLine = null;
+		while ((inputLine = in.readLine()) != null) {
+			response = inputLine;
+		}
+		
+		// response 가 object 냐 array에 따라 parse를 다르게한다.
+		try {
+			obj = (JSONObject) JSONValue.parse(response);
+		} catch (Exception e) {
+			try {
+				JSONArray reponse_array = (JSONArray) JSONValue.parse(response);
+				obj.put("data", reponse_array);
+			} catch (Exception ex) {
+				throw new CoolsmsSystemException(ex.getMessage().toString(), 302);
+			}
+		}
+				
 		return obj;
 	}
 	
@@ -298,13 +270,14 @@ public class Coolsms {
 	 * @param string value [required]
 	 * @param string delimiter [required]
 	 * @return stringbuffer
+	 * @throws CoolsmsException 
 	 */
-	public StringBuffer setPostData(StringBuffer builder, String key, String value, String delimiter) {
+	public StringBuffer setPostData(StringBuffer builder, String key, String value, String delimiter) throws CoolsmsException {
 		try {
 			builder.append(setValue(key, value));
 			builder.append(delimiter);
 		} catch(Exception e) {
-			return null;
+			throw new CoolsmsSystemException(e.getMessage().toString(), 302);
 		}
 
 		return builder;
@@ -317,15 +290,16 @@ public class Coolsms {
 	 * @param string value [required]
 	 * @param string charSet [required]
 	 * @return string
+	 * @throws CoolsmsException 
 	 */
-	public String setGetData(String data, String key, String value, String charSet) {
+	public String setGetData(String data, String key, String value, String charSet) throws CoolsmsException {
 		try {
 			data += "&"
 				+ URLEncoder.encode(key, charSet)
 				+ "="
 				+ URLEncoder.encode(value, charSet);
 		} catch(Exception e) {
-			return null;
+			throw new CoolsmsSystemException(e.getMessage().toString(), 302);
 		}
 		return data;
 	}
@@ -354,8 +328,9 @@ public class Coolsms {
 	 * @param string api_secret [required]
 	 * @param string timestamp [required]
 	 * @return string
+	 * @throws CoolsmsException 
 	 */
-	public String getSignature(String api_secret, String salt, String timestamp) {
+	public String getSignature(String api_secret, String salt, String timestamp) throws CoolsmsException {
 		String signature = "";
 		
 		try {
@@ -375,7 +350,7 @@ public class Coolsms {
 			}
 			signature = new String(hexChars);
 		} catch (Exception e) {
-			signature = e.getMessage();
+			throw new CoolsmsSystemException(e.getMessage().toString(), 302);
 		}
 		return signature;
 	}
