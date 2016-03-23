@@ -1,4 +1,4 @@
-package com.nurigo.java_sdk;
+package net.nurigo.java_sdk;
 
 import java.io.*;
 import java.net.URL;

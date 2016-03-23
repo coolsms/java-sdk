@@ -1,12 +1,12 @@
-package com.nurigo.java_sdk.api;
+package net.nurigo.java_sdk.api;
 
 import java.util.HashMap;
 
+import net.nurigo.java_sdk.Coolsms;
+
 import org.json.simple.JSONObject;
 
-import com.nurigo.java_sdk.Coolsms;
-
-public class Message extends Coolsms{	
+public class Message extends Coolsms {	
 	public Message(String api_key, String api_secret) {
 		super(api_key, api_secret);		
 	}

@@ -1,6 +1,6 @@
-package com.nurigo.java_sdk.exceptions;
+package net.nurigo.java_sdk.exceptions;
 
-public class CoolsmsException extends Exception{
+public class CoolsmsException extends Exception {
 	
 
 }

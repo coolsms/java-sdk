@@ -1,4 +1,4 @@
-package com.nurigo.java_sdk.javaSDK;
+package net.nurigo.java_sdk.javaSDK;
 
 /**
  * Hello world!
