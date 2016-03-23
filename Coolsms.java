@@ -13,6 +13,9 @@ import java.util.Random;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import net.nurigo.java_sdk.exceptions.CoolsmsException;
+import net.nurigo.java_sdk.exceptions.CoolsmsSDKException;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -61,18 +64,19 @@ public class Coolsms {
 		this.api_key = api_key;
 		this.api_secret = api_secret;
 	}
-	
+		
 	/**
 	 * @brief postRequest (POST)
 	 * @param string resource [required]
 	 * @param hashmap<string, string> params [required]
-	 * @return jsonObject
+	 * @return JSONObject
+	 * @throws CoolsmsException 
 	 */
-	public JSONObject postRequest(String resource, HashMap<String, String> params) {
+	public JSONObject postRequest(String resource, HashMap<String, String> params) throws CoolsmsException {
 		JSONObject obj = new JSONObject();
 		
-		// set base info
-		params = setBaseInfo(params);
+		// set base info		
+		params = setBaseInfo(params);		
 		
 		// create delimiter
 		String boundary = this.salt + this.timestamp;
@@ -80,24 +84,15 @@ public class Coolsms {
 
 		// create stringbuffer and append delimiter
 		StringBuffer postDataBuilder = new StringBuffer();
-		postDataBuilder.append(delimiter);
-
-		// image, image_path will pass in a different way 
-		String image = null;
-		String image_path = "./";	
-		if (params.get("image") != null) {
-			image = params.get("image");
-			params.remove("image");			
-		}		
-		if (params.get("image_path") != null) {
-			image_path = params.get("image_path");
-			params.remove("image_path");
-		}	
-			
+		postDataBuilder.append(delimiter);	
+				
 		// set contents
 		for (Entry<String, String> entry : params.entrySet()) {
 			String key = entry.getKey();
 			String value = entry.getValue();
+			
+			// if key is image. continue
+			if (key == "image") continue;
 			
 			postDataBuilder = setPostData(postDataBuilder, key, value, delimiter);
 			if (postDataBuilder == null) {
@@ -119,13 +114,12 @@ public class Coolsms {
 			DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(connection.getOutputStream()));
 
 			// set image data 
-			if(image != null) {
-				System.out.println(image);
-				System.out.println(image_path);
+			if(params.get("image") != null) {
 				// set image file 
-				postDataBuilder.append(setFile("image", image));				
-				postDataBuilder.append("\r\n");
-				FileInputStream fileStream = new FileInputStream(image_path + image);				
+				postDataBuilder.append(setFile("image", params.get("image")));	
+				postDataBuilder.append("\r\n");				
+				
+				FileInputStream fileStream = new FileInputStream(params.get("image"));
 				outputStream.writeUTF(postDataBuilder.toString());
 				
 				// add an image file to the buffer
@@ -138,7 +132,7 @@ public class Coolsms {
 					bufferSize = Math.min(fileStream.available(), maxBufferSize);
 					byteRead = fileStream.read(buffer, 0, bufferSize);
 				}
-				fileStream.close();
+				fileStream.close();				
 			} else {
 				outputStream.writeUTF(postDataBuilder.toString());
 			}
@@ -148,7 +142,7 @@ public class Coolsms {
 			outputStream.close();
 
 			String response = null;
-			String inputLine; 
+			String inputLine = null; 
 			int response_code = connection.getResponseCode();
 			BufferedReader in = null;
 			
@@ -171,7 +165,7 @@ public class Coolsms {
 				}
 			} else {
 				obj.put("status", false);
-				obj.put("message", "response is empty");
+				obj.put("message", "response is empty");			
 			}
 		} catch (Exception e) {
 			obj.put("status", false);
@@ -185,9 +179,10 @@ public class Coolsms {
 	 * @brief https request ( GET )
 	 * @param string resource [required]
 	 * @param hashmap<string, string> params [required]
-	 * @return jsonObject
+	 * @return JSONObject
+	 * @throws CoolsmsException 
 	 */
-	public JSONObject request(String resource, HashMap<String, String> params) {
+	public JSONObject request(String resource, HashMap<String, String> params) throws CoolsmsException {			
 		JSONObject obj = new JSONObject();
 		try {
 			// set base info
