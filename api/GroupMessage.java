@@ -8,6 +8,10 @@ import net.nurigo.java_sdk.exceptions.CoolsmsSDKException;
 
 import org.json.simple.JSONObject;
 
+/**
+ * @class GroupMessage
+ * @brief management group message, using Rest API
+ */
 public class GroupMessage extends Coolsms {	
 	/**
 	 * @brief constructor
@@ -113,7 +117,7 @@ public class GroupMessage extends Coolsms {
 	 */
 	public JSONObject getMessageList(HashMap<String, String> params) throws CoolsmsException
 	{
-		if (!checkString(params.get("group_id")) || !checkString(params.get("group_id"))) throw new CoolsmsSDKException("group_id is required", 202);
+		if (!checkString(params.get("group_id"))) throw new CoolsmsSDKException("group_id is required", 202);
 
 		String resource = "groups/" + params.get("group_id") + "/message_list";        
 		return request(resource, params);

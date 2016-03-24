@@ -8,6 +8,10 @@ import net.nurigo.java_sdk.exceptions.CoolsmsSDKException;
 
 import org.json.simple.JSONObject;
 
+/**
+ * @class SenderID 
+ * @brief management sender id, using Rest API
+ */
 public class SenderID extends Coolsms {	
 	/**  
 	 * @brief constructor
@@ -80,7 +84,7 @@ public class SenderID extends Coolsms {
 	/**
 	 * @brief set default sender id ( HTTP Method POST )
 	 * @param hashmap<string, string> params {
-	 *   @param string phone [required]
+	 *   @param string handle_key [required]
 	 *   @param string site_user [optional] }
 	 * @return None
 	 * @throws CoolsmsException 

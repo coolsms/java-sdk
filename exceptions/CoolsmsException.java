@@ -1,5 +1,9 @@
 package net.nurigo.java_sdk.exceptions;
 
+/**
+ * @class CoolsmsException
+ * @brief Thrown when an SDK call returns an comprehensive exception.
+ */
 public class CoolsmsException extends Exception {
 	private int code;
 
