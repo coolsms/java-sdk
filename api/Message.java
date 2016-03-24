@@ -24,7 +24,7 @@ public class Message extends Coolsms {
 	public JSONObject send(HashMap<String, String> params)  throws CoolsmsException {
 		return postRequest("send", params);		
 	}
-	
+
 	/**
 	 * @brief sent messages
 	 * @param hashmap<string, string> set

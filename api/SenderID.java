@@ -15,7 +15,7 @@ public class SenderID extends Coolsms {
 	 */	
 	public SenderID(String api_key, String api_secret) throws CoolsmsException {
 		super(api_key, api_secret);
-		
+
 		// set API and version
 		setApiConfig("senderid", "1.1");
 	}
@@ -24,34 +24,34 @@ public class SenderID extends Coolsms {
 	 * @brief sender id registration request ( HTTP Method POST )
 	 * @param hashmap<string, string> params {
 	 *   @param string phone [required]
-     *   @param string site_user [optional] }
+	 *   @param string site_user [optional] }
 	 * @return JSONObject
 	 * @throws CoolsmsException
 	 */
 	public JSONObject register(HashMap<String, String> params)  throws CoolsmsException {
 		if (!checkString(params.get("phone"))) throw new CoolsmsSDKException("phone number is required", 202);	
-		
+
 		return postRequest("register", params);		
 	}
-	
+
 	/**
 	 * @brief verify sender id ( HTTP Method POST )
-     * @param string handle_key [required]
+	 * @param string handle_key [required]
 	 * @return None
 	 * @throws CoolsmsException
 	 */
 	public JSONObject verify(String handle_key) throws CoolsmsException {		
 		if (checkString(handle_key)) throw new CoolsmsSDKException("handle_key is required", 202);	
-		
+
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("handle_key", handle_key);				
-		
+
 		return postRequest("verify", params);
 	}
 
 	/**
 	 * @brief delete sender id ( HTTP Method POST )
-     * @param string handle_key [required]
+	 * @param string handle_key [required]
 	 * @return None
 	 * @throws CoolsmsException
 	 */
@@ -60,49 +60,49 @@ public class SenderID extends Coolsms {
 
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("handle_key", handle_key);		
-		
+
 		return postRequest("delete", params);
 	}
 
 	/**
 	 * @brief get sender id list ( HTTP Method GET )
-     * @param string site_user [optional]
+	 * @param string site_user [optional]
 	 * @return JSONObject
 	 * @throws CoolsmsException 
 	 */
 	public JSONObject getSenderidList(String site_user) throws CoolsmsException {		
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("site_user", site_user);
-		
+
 		return request("list", params);
 	}
-	
+
 	/**
-     * @brief set default sender id ( HTTP Method POST )
-     * @param hashmap<string, string> params {
-     *   @param string phone [required]
-     *   @param string site_user [optional] }
-     * @return None
+	 * @brief set default sender id ( HTTP Method POST )
+	 * @param hashmap<string, string> params {
+	 *   @param string phone [required]
+	 *   @param string site_user [optional] }
+	 * @return None
 	 * @throws CoolsmsException 
-     */
-    public JSONObject setDefault(HashMap<String, String> params) throws CoolsmsException 
-    {    	
-        if (!checkString(params.get("handle_key"))) throw new CoolsmsSDKException("handle_key is required", 202);    
-        
-        return postRequest("set_default", params);
-    }
-    
-    /**
-     * @brief get default sender id ( HTTP Method GET )
-     * @param string site_user [optional]
-     * @return JSONObject
-     * @throws CoolsmsException 
-     */
-    public JSONObject getDefault(String site_user) throws CoolsmsException
-    {
-    	HashMap<String, String> params = new HashMap<String, String>();
+	 */
+	public JSONObject setDefault(HashMap<String, String> params) throws CoolsmsException 
+	{    	
+		if (!checkString(params.get("handle_key"))) throw new CoolsmsSDKException("handle_key is required", 202);    
+
+		return postRequest("set_default", params);
+	}
+
+	/**
+	 * @brief get default sender id ( HTTP Method GET )
+	 * @param string site_user [optional]
+	 * @return JSONObject
+	 * @throws CoolsmsException 
+	 */
+	public JSONObject getDefault(String site_user) throws CoolsmsException
+	{
+		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("site_user", site_user);
-		
-        return request("get_default", params);
-    }
+
+		return request("get_default", params);
+	}
 }

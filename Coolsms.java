@@ -44,18 +44,18 @@ public class Coolsms {
 	/** base resource url & sdk_version */
 	final String URL = "https://api.coolsms.co.kr";
 	final String SDK_VERSION = "1.0";
-	
+
 	/** api name & api version */
 	private String api_name = "sms";
 	private String api_version = "1.5";
-	
+
 	/** need for authentication  */
 	private String salt;
 	private String timestamp;
 	private String signature;
 	private String api_key;
 	private String api_secret;		
-	
+
 	/**
 	 * @brief set api_key, api_secret
 	 * @param string api_key [required]
@@ -67,7 +67,7 @@ public class Coolsms {
 		this.api_key = api_key;
 		this.api_secret = api_secret;
 	}
-		
+
 	/**
 	 * @brief postRequest (POST)
 	 * @param string resource [required]
@@ -77,10 +77,10 @@ public class Coolsms {
 	 */
 	public JSONObject postRequest(String resource, HashMap<String, String> params) throws CoolsmsException {		
 		JSONObject obj = new JSONObject();
-		
+
 		// set base info
 		params = setBaseInfo(params);		
-		
+
 		// create delimiter
 		String boundary = this.salt + this.timestamp;
 		String delimiter = "\r\n--" + boundary + "\r\n";
@@ -88,17 +88,17 @@ public class Coolsms {
 		// create stringbuffer and append delimiter
 		StringBuffer postDataBuilder = new StringBuffer();
 		postDataBuilder.append(delimiter);	
-		
+
 		// set contents
 		for (Entry<String, String> entry : params.entrySet()) {
 			String key = entry.getKey();
 			String value = entry.getValue();
-			
+
 			// if key is image. continue
 			if (key == "image") continue;	
 			postDataBuilder = setPostData(postDataBuilder, key, value, delimiter);
 		}
-		
+
 		try {
 			// start https connection	
 			URL url = new URL(getResourceUrl(resource));
@@ -145,7 +145,7 @@ public class Coolsms {
 		} catch (IOException e) {
 			throw new CoolsmsSystemException(e.getMessage().toString(), 399);
 		}
-		
+
 		return obj;
 	}		
 
@@ -158,7 +158,7 @@ public class Coolsms {
 	 */
 	public JSONObject request(String resource, HashMap<String, String> params) throws CoolsmsException {		
 		JSONObject obj = new JSONObject();
-		
+
 		try {
 			// set base info
 			params = setBaseInfo(params);		
@@ -205,23 +205,23 @@ public class Coolsms {
 		} catch (IOException e) {
 			throw new CoolsmsSystemException(e.getMessage().toString(), 399);
 		}		
-		
+
 		return obj;
 	}
-	
+
 	/**
 	 * @brief set api name and api version
-     * @param string $api_name [required] 'sms', 'senderid', 'image'
-     * @param integer $api_version [required]
+	 * @param string $api_name [required] 'sms', 'senderid', 'image'
+	 * @param integer $api_version [required]
 	 * @throws CoolsmsException 
 	 */
 	public void setApiConfig(String api_name, String api_version) throws CoolsmsException
-    {
-        if (!checkString(api_name) || !checkString(api_version)) throw new CoolsmsSDKException("API name and version is requried", 201);
-        this.api_name = api_name;
-        this.api_version = api_version;
-    }
-	
+	{
+		if (!checkString(api_name) || !checkString(api_version)) throw new CoolsmsSDKException("API name and version is requried", 201);
+		this.api_name = api_name;
+		this.api_version = api_version;
+	}
+
 	/**	 
 	 * @brief set base info
 	 * @param hashmap<string, string> params [required]
@@ -230,11 +230,11 @@ public class Coolsms {
 	 */
 	private HashMap<String, String> setBaseInfo(HashMap<String, String> params) throws CoolsmsException {
 		Properties properties = System.getProperties();
-		
+
 		this.salt = salt();
 		this.timestamp = getTimestamp();
 		this.signature = getSignature(this.api_secret, salt, timestamp); // getSignature
-		
+
 		params.put("api_key", this.api_key);
 		params.put("salt", this.salt);
 		params.put("signature", this.signature);
@@ -246,11 +246,11 @@ public class Coolsms {
 	}
 
 	/**
-     * @brief 업로드할 파일에 대한 메타 데이터를 설정한다.
-     * @param string key [required] 서버에서 사용할 파일 변수명
-     * @param string fileName [required] 서버에서 저장될 파일명
-     * @return string
-     */
+	 * @brief 업로드할 파일에 대한 메타 데이터를 설정한다.
+	 * @param string key [required] 서버에서 사용할 파일 변수명
+	 * @param string fileName [required] 서버에서 저장될 파일명
+	 * @return string
+	 */
 	public String setFile(String key, String fileName) {
 		return "Content-Disposition: form-data; name=\"" + key
 				+ "\";filename=\"" + fileName
@@ -290,16 +290,16 @@ public class Coolsms {
 	public String setGetData(String data, String key, String value, String charSet) throws CoolsmsException {
 		try {
 			data += "&"
-				+ URLEncoder.encode(key, charSet)
-				+ "="
-				+ URLEncoder.encode(value, charSet);
+					+ URLEncoder.encode(key, charSet)
+					+ "="
+					+ URLEncoder.encode(value, charSet);
 		} catch(Exception e) {
 			throw new CoolsmsSystemException(e.getMessage().toString(), 302);
 		}
-		
+
 		return data;
 	}
-	
+
 	/**
 	 * @brief return resource url from api.coolsms.co.kr
 	 * @param string resource [required]
@@ -319,7 +319,7 @@ public class Coolsms {
 	 */
 	public String getSignature(String api_secret, String salt, String timestamp) throws CoolsmsException {
 		String signature = "";
-		
+
 		try {
 			String temp = timestamp + salt;
 			SecretKeySpec keySpec = new SecretKeySpec(api_secret.getBytes(), "HmacMD5");
@@ -339,7 +339,7 @@ public class Coolsms {
 		} catch (Exception e) {
 			throw new CoolsmsSystemException(e.getMessage().toString(), 302);
 		}
-		
+
 		return signature;
 	}
 
@@ -352,7 +352,7 @@ public class Coolsms {
 		String timestamp = Long.toString(timestamp_long);
 		return timestamp;
 	}
-	
+
 	/**
 	 * @brief get https response
 	 * @param httpurlconnection api_key [required]
@@ -366,7 +366,7 @@ public class Coolsms {
 		BufferedReader in = null;
 		JSONObject obj = new JSONObject();		
 		int response_code = connection.getResponseCode();
-		
+
 		if (response_code != 200) {
 			// if response code is 200, throw CoolsmsServerException
 			in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));				
@@ -375,14 +375,14 @@ public class Coolsms {
 		} else {
 			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 		}
-		
+
 		while ((inputLine = in.readLine()) != null) {					
 			response = inputLine;
 		}
-		
+
 		return response;
 	}
-	
+
 	/**
 	 * @brief get salt data
 	 * @return string
@@ -396,10 +396,10 @@ public class Coolsms {
 			int randomInt = randomGenerator.nextInt(10); // digit range from 0 - 9
 			uniqId += randomInt + "";
 		}
-		
+
 		return uniqId;
 	}
-	
+
 	/**
 	 * @brief check string is empty or null
 	 * @return boolean
