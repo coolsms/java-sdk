@@ -73,9 +73,10 @@ public class Coolsms {
 	 * @param hashmap<string, string> params [required]
 	 * @return JSONObject
 	 * @throws CoolsmsException 
-	 * @throws IOException 
 	 */
-	public JSONObject postRequest(String resource, HashMap<String, String> params) throws CoolsmsException, IOException {		
+	public JSONObject postRequest(String resource, HashMap<String, String> params) throws CoolsmsException {		
+		JSONObject obj = new JSONObject();
+		
 		// set base info		
 		params = setBaseInfo(params);		
 		
@@ -97,48 +98,53 @@ public class Coolsms {
 			postDataBuilder = setPostData(postDataBuilder, key, value, delimiter);
 		}
 		
-		// start https connection	
-		URL url = new URL(getResourceUrl(resource));
-		HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-		connection.setDoInput(true);
-		connection.setDoOutput(true);
-		connection.setRequestMethod("POST");
-		connection.setRequestProperty("Connection", "Keep-Alive");
-		connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
-		connection.setUseCaches(false);
-		DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(connection.getOutputStream()));
+		try {
+			// start https connection	
+			URL url = new URL(getResourceUrl(resource));
+			HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+			connection.setDoInput(true);
+			connection.setDoOutput(true);
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Connection", "Keep-Alive");
+			connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+			connection.setUseCaches(false);
+			DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(connection.getOutputStream()));
 
-		// set image data 
-		if(params.get("image") != null) {
-			// set image file 
-			postDataBuilder.append(setFile("image", params.get("image")));	
-			postDataBuilder.append("\r\n");				
+			// set image data 
+			if(params.get("image") != null) {
+				// set image file 
+				postDataBuilder.append(setFile("image", params.get("image")));	
+				postDataBuilder.append("\r\n");				
 
-			FileInputStream fileStream = new FileInputStream(params.get("image"));
-			outputStream.writeUTF(postDataBuilder.toString());
+				FileInputStream fileStream = new FileInputStream(params.get("image"));
+				outputStream.writeUTF(postDataBuilder.toString());
 
-			// add an image file to the buffer
-			int maxBufferSize = 1024;
-			int bufferSize = Math.min(fileStream.available(), maxBufferSize);
-			byte[] buffer = new byte[bufferSize];
-			int byteRead = fileStream.read(buffer, 0, bufferSize);
-			while (byteRead > 0) {
-				outputStream.write(buffer);
-				bufferSize = Math.min(fileStream.available(), maxBufferSize);
-				byteRead = fileStream.read(buffer, 0, bufferSize);
+				// add an image file to the buffer
+				int maxBufferSize = 1024;
+				int bufferSize = Math.min(fileStream.available(), maxBufferSize);
+				byte[] buffer = new byte[bufferSize];
+				int byteRead = fileStream.read(buffer, 0, bufferSize);
+				while (byteRead > 0) {
+					outputStream.write(buffer);
+					bufferSize = Math.min(fileStream.available(), maxBufferSize);
+					byteRead = fileStream.read(buffer, 0, bufferSize);
+				}
+				fileStream.close();
+			} else {
+				outputStream.writeUTF(postDataBuilder.toString());
 			}
-			fileStream.close();
-		} else {
-			outputStream.writeUTF(postDataBuilder.toString());
+
+			outputStream.writeBytes(delimiter); 
+			outputStream.flush();
+			outputStream.close();
+
+			// get response data
+			String response = getHttpsResponse(connection); 
+			obj = (JSONObject) JSONValue.parse(response);	
+		} catch (IOException e) {
+			throw new CoolsmsSystemException(e.getMessage().toString(), 399);
 		}
-
-		outputStream.writeBytes(delimiter); 
-		outputStream.flush();
-		outputStream.close();
-
-		// get response data
-		String response =getHttpsResponse(connection); 
-		JSONObject obj = (JSONObject) JSONValue.parse(response);	
+		
 		return obj;
 	}		
 
@@ -148,52 +154,57 @@ public class Coolsms {
 	 * @param hashmap<string, string> params [required]
 	 * @return JSONObject
 	 * @throws CoolsmsException 
-	 * @throws IOException 
 	 */
-	public JSONObject request(String resource, HashMap<String, String> params) throws CoolsmsException, IOException {		
-		// set base info
-		params = setBaseInfo(params);		
-		String charset = "UTF8";			
-		String data = getResourceUrl(resource) + "?";
-		data = data + URLEncoder.encode("api_key", charset) + "=" + URLEncoder.encode(this.api_key, charset);
-
-		// remove api_secret
-		params.remove("api_secret");		
-
-		// set contents
-		for (Entry<String, String> entry : params.entrySet()) {				
-			String key = entry.getKey();
-			String value = entry.getValue();
-
-			// api_key 는 위에서 넣어줬기 때문에 continue
-			if (key == "api_key") continue;
-
-			data = setGetData(data, key, value, charset);
-			if(data == null) {
-				throw new CoolsmsSDKException("params is something wrong.", 201);				
-			}
-		}
-
-		URL url = new URL(data);
-		HttpsURLConnection connection = (HttpsURLConnection) url.openConnection(); 
-		connection.setRequestMethod("GET");		
-		
-		// get response data
-		String response = getHttpsResponse(connection);
+	public JSONObject request(String resource, HashMap<String, String> params) throws CoolsmsException {		
 		JSONObject obj = new JSONObject();
 		
-		// response 가 object 냐 array에 따라 parse를 다르게한다.
 		try {
-			obj = (JSONObject) JSONValue.parse(response);
-		} catch (Exception e) {
-			try {
-				JSONArray reponse_array = (JSONArray) JSONValue.parse(response);
-				obj.put("data", reponse_array);
-			} catch (Exception ex) {
-				throw new CoolsmsSystemException(ex.getMessage().toString(), 302);
+			// set base info
+			params = setBaseInfo(params);		
+			String charset = "UTF8";			
+			String data = getResourceUrl(resource) + "?";
+			data = data + URLEncoder.encode("api_key", charset) + "=" + URLEncoder.encode(this.api_key, charset);
+
+			// remove api_secret
+			params.remove("api_secret");		
+
+			// set contents
+			for (Entry<String, String> entry : params.entrySet()) {				
+				String key = entry.getKey();
+				String value = entry.getValue();
+
+				// api_key 는 위에서 넣어줬기 때문에 continue
+				if (key == "api_key") continue;
+
+				data = setGetData(data, key, value, charset);
+				if(data == null) {
+					throw new CoolsmsSDKException("params is something wrong.", 201);				
+				}
 			}
-		}
-				
+
+			URL url = new URL(data);
+			HttpsURLConnection connection = (HttpsURLConnection) url.openConnection(); 
+			connection.setRequestMethod("GET");		
+
+			// get response data
+			String response = getHttpsResponse(connection);
+
+
+			// response 가 object 냐 array에 따라 parse를 다르게한다.
+			try {
+				obj = (JSONObject) JSONValue.parse(response);
+			} catch (Exception e) {
+				try {
+					JSONArray response_array = (JSONArray) JSONValue.parse(response);
+					obj.put("data", response_array);
+				} catch (Exception ex) {
+					throw new CoolsmsSystemException(ex.getMessage().toString(), 302);
+				}
+			}						
+		} catch (IOException e) {
+			throw new CoolsmsSystemException(e.getMessage().toString(), 399);
+		}		
+		
 		return obj;
 	}
 	
@@ -243,7 +254,8 @@ public class Coolsms {
 	 */
 	public StringBuffer setPostData(StringBuffer builder, String key, String value, String delimiter) throws CoolsmsException {
 		try {
-			builder.append(setValue(key, value));
+			String data = "Content-Disposition: form-data; name=\"" + key + "\"\r\n\r\n"+ value;			
+			builder.append(data);
 			builder.append(delimiter);
 		} catch(Exception e) {
 			throw new CoolsmsSystemException(e.getMessage().toString(), 302);
@@ -270,16 +282,8 @@ public class Coolsms {
 		} catch(Exception e) {
 			throw new CoolsmsSystemException(e.getMessage().toString(), 302);
 		}
+		
 		return data;
-	}
-	
-	/**
-     * @brief map 형식으로 key와 value를 셋팅한다.
-     * @param string key [required] 서버에서 사용할 변수명
-     * @param string value [required] 변수명에 해당하는 실제 값
-     */
-	public String setValue(String key, String value) {
-		return "Content-Disposition: form-data; name=\"" + key + "\"\r\n\r\n"+ value;
 	}
 	
 	/**
@@ -321,6 +325,7 @@ public class Coolsms {
 		} catch (Exception e) {
 			throw new CoolsmsSystemException(e.getMessage().toString(), 302);
 		}
+		
 		return signature;
 	}
 
@@ -377,6 +382,7 @@ public class Coolsms {
 			int randomInt = randomGenerator.nextInt(10); // digit range from 0 - 9
 			uniqId += randomInt + "";
 		}
+		
 		return uniqId;
 	}
 }
