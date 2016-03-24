@@ -21,6 +21,7 @@ import net.nurigo.java_sdk.exceptions.CoolsmsSystemException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.junit.Test;
 
 /**
  * @mainpage JAVA SDK
@@ -77,7 +78,7 @@ public class Coolsms {
 	public JSONObject postRequest(String resource, HashMap<String, String> params) throws CoolsmsException {		
 		JSONObject obj = new JSONObject();
 		
-		// set base info		
+		// set base info
 		params = setBaseInfo(params);		
 		
 		// create delimiter
@@ -87,7 +88,7 @@ public class Coolsms {
 		// create stringbuffer and append delimiter
 		StringBuffer postDataBuilder = new StringBuffer();
 		postDataBuilder.append(delimiter);	
-				
+		
 		// set contents
 		for (Entry<String, String> entry : params.entrySet()) {
 			String key = entry.getKey();
@@ -384,5 +385,14 @@ public class Coolsms {
 		}
 		
 		return uniqId;
+	}
+	
+	/**
+	 * @brief check string is empty or null
+	 * @return boolean
+	 */
+	public boolean checkString(String str) {
+		if (str == null || str.isEmpty()) return false;
+		return true;
 	}
 }
