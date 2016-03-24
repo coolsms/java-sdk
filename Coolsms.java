@@ -209,6 +209,19 @@ public class Coolsms {
 		return obj;
 	}
 	
+	/**
+	 * @brief set api name and api version
+     * @param string $api_name [required] 'sms', 'senderid', 'image'
+     * @param integer $api_version [required]
+	 * @throws CoolsmsException 
+	 */
+	public void setApiConfig(String api_name, String api_version) throws CoolsmsException
+    {
+        if (!checkString(api_name) || !checkString(api_version)) throw new CoolsmsSDKException("API name and version is requried", 201);
+        this.api_name = api_name;
+        this.api_version = api_version;
+    }
+	
 	/**	 
 	 * @brief set base info
 	 * @param hashmap<string, string> params [required]

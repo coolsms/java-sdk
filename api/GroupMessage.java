@@ -41,7 +41,9 @@ public class GroupMessage extends Coolsms {
 	 * @return JSONArray
 	 * @throws CoolsmsException
 	 */
-	public JSONObject getGroupList(HashMap<String, String> params) throws CoolsmsException {		
+	public JSONObject getGroupList() throws CoolsmsException {		
+		// resource 'balance' does not required params so hand over empty params.
+		HashMap<String, String> params = new HashMap<String, String>();		
 		return request("sent", params);		
 	}
 
