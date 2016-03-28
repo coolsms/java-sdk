@@ -48,7 +48,7 @@ public class GroupMessage extends Coolsms {
 	public JSONObject getGroupList() throws CoolsmsException {		
 		// resource 'balance' does not required params so hand over empty params.
 		HashMap<String, String> params = new HashMap<String, String>();		
-		return request("sent", params);		
+		return request("group_list", params);		
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class GroupMessage extends Coolsms {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("group_ids", group_ids);		
 
-		return postRequest("cancel", params);		
+		return postRequest("delete_groups", params);		
 	}
 
 	/**
@@ -77,7 +77,8 @@ public class GroupMessage extends Coolsms {
 
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("group_id", group_id);
-		return request("balance", params);
+		String resource = "groups/" + group_id;        
+		return request(resource, params);
 	}
 
 	/**
