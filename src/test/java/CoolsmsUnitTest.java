@@ -16,8 +16,8 @@ import org.junit.Test;
 
 
 public class CoolsmsUnitTest {
-	String api_key = "NCS558104628ADED";
-	String api_secret = "983C21FB95000DCBD2A1C4FE25F14883";
+	String api_key = "CS56FA79F8AD35B";
+	String api_secret = "33D8D055C7DA53F45404941B6BD7900D";
 	
 	Message message = new Message(api_key, api_secret);
 	GroupMessage groupMessage = new GroupMessage(api_key, api_secret);
@@ -135,6 +135,39 @@ public class CoolsmsUnitTest {
 	public void SenderIDTest() {
 		 try {
 			this.senderID = new SenderID(api_key, api_secret);
+			String handle_key;
+			
+			// register
+			params.put("phone", "01000000000");
+			result = senderID.register(params);
+			handle_key = (String) result.get("handle_key");
+			assertNotNull(result.get("handle_key"));
+						
+			// verify
+			try {
+				senderID.verify(handle_key);
+			} catch(CoolsmsException e) {
+				result = (JSONObject) JSONValue.parse(e.getMessage());
+				assertEquals(result.get("code"), "Busy");				
+			}
+			
+			// get senderid list			
+			result = senderID.getSenderidList(params);			
+			assertNotNull(result.get("data"));
+			
+			// get default			
+			try {
+				result = senderID.getDefault(params);
+				assertNotNull(result.get("handle_key"));				
+			} catch(CoolsmsException e) {
+				result = (JSONObject) JSONValue.parse(e.getMessage());				
+				assertEquals(result.get("code"), "NoDefaultSenderID");				
+			}			
+			
+			// set default
+			params.put("handle_key", "testHandleKey");
+			result = senderID.setDefault(params);
+			assertTrue(result.isEmpty());
 		} catch (CoolsmsException e) {			
 			fail(e.toString());
 		}
