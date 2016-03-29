@@ -20,7 +20,7 @@ public class ExampleDelete {
 			SenderID coolsms = new SenderID(api_key, api_secret);		
 
 			// handle_key are mandatory
-			String handle_key = "C28239CWIUD"; // sender number handle key. check for 'ExampleList'
+			String handle_key = "SID56FA3A1266426"; // sender number handle key. check for 'ExampleList'
 			
 			JSONObject obj = (JSONObject) coolsms.delete(handle_key);
 			System.out.println(obj.toString());

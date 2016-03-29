@@ -16,7 +16,7 @@ public class ExampleSend {
 		GroupMessage coolsms = new GroupMessage(api_key, api_secret);
 		
 		// group_id, message_ids are mandatory.
-		String group_id = "GID384DEIE1932"; // Group ID	
+		String group_id = "GID56FA3B1BF0826"; // Group ID	
 		
 		try {
 			JSONObject obj = (JSONObject) coolsms.sendGroupMessage(group_id);

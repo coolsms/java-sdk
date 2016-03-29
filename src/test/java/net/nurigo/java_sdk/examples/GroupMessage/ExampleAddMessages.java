@@ -23,7 +23,7 @@ public class ExampleAddMessages {
 		params.put("to", "01000000000");
 		params.put("from", "01000000000");
 		params.put("text", "Coolsms Testing Message!");
-		params.put("group_id", "GID384DEIE1932"); // Group ID	    
+		params.put("group_id", "GID56FA3B1BF0826"); // Group ID	    
 
 	    // Optional parameters for your own needs
 		// params.put("type", "SMS"); // Message type ( SMS, LMS, MMs )

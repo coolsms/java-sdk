@@ -16,7 +16,7 @@ public class ExampleDeleteGrouops {
 		GroupMessage coolsms = new GroupMessage(api_key, api_secret);		
 		
 		// group_ids are mandatory		
-		String group_ids = "GID384DEIE1932"; // Group IDs
+		String group_ids = "GID56FA3B1BF0826, GID56FA3B1BF0836"; // Group IDs
 		
 		try {
 			JSONObject obj = (JSONObject) coolsms.deleteGroups(group_ids);

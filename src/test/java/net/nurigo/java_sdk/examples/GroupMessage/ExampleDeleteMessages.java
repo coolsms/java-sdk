@@ -16,8 +16,8 @@ public class ExampleDeleteMessages {
 		GroupMessage coolsms = new GroupMessage(api_key, api_secret);		
 		
 		// group_id, message_ids are mandatory.
-		String group_id = "GID384DEIE1932"; // Group ID
-		String message_ids = "MID392EODK234, MID23921982"; // Message Ids
+		String group_id = "GID56FA3B1BF0826"; // Group ID
+		String message_ids = "MID56FA3B405A847, MIDFFFA3B405A847"; // Message Ids
 		
 		
 		try {

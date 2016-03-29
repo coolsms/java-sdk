@@ -19,7 +19,7 @@ public class ExampleMessageList {
 		
 		// Optional parameters for your own needs
 		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("group_id", "GID384DEIE1932"); // Group ID
+		params.put("group_id", "GID56FA3B1BF0826"); // Group ID
 		// params.put("offset", "0"); // default 0
 		// params.put("limit", "20"); // default 20
 		
