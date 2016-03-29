@@ -21,7 +21,7 @@ public class ExampleSetDefault {
 
 			// handle_key are mandatory
 			HashMap<String, String> params = new HashMap<String, String>();			
-			// params.put("handle_key", "C293829SCDEE"); // sender number handle key. check for 'ExampleSenderIdList' 
+			params.put("handle_key", "SID56FA3A1266426"); // sender number handle key. check for 'ExampleSenderIdList' 
 			
 			// Optional parameters for your own needs
 			// params.put("site_user", "admin"); // site user id. '__private__' is default

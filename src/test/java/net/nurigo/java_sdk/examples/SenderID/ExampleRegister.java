@@ -21,12 +21,12 @@ public class ExampleRegister {
 			
 			// phone are mandatory. must be filled
 			HashMap<String, String> params = new HashMap<String, String>();			
-			// params.put("phone", "01000000000"); // sender number to register 
+			params.put("phone", "01000000000"); // sender number to register 
 			
 			// Optional parameters for your own needs
 			// params.put("site_user", "admin"); // site user id. '__private__' is default
 			
-			JSONObject obj = (JSONObject) coolsms.getDefault(params);
+			JSONObject obj = (JSONObject) coolsms.register(params);
 			System.out.println(obj.toString());
 		} catch (CoolsmsException e) {
 			System.out.println(e.getMessage());
