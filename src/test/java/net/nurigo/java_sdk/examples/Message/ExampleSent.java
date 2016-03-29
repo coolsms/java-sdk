@@ -29,7 +29,7 @@ public class ExampleSent {
 		// params.put("end", "201601071230"); // set search end date
 		
 		try {
-			JSONObject obj = (JSONObject) coolsms.getStatus(params);
+			JSONObject obj = (JSONObject) coolsms.sent(params);
 			System.out.println(obj.toString());
 		} catch (CoolsmsException e) {
 			System.out.println(e.getMessage());

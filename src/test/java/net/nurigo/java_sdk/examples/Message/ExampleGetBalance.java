@@ -18,7 +18,7 @@ public class ExampleGetBalance {
 		try {
 			JSONObject obj = (JSONObject) coolsms.balance();
 			System.out.println(obj.toString());
-		} catch (CoolsmsException e) {
+		} catch (CoolsmsException e) {			
 			System.out.println(e.getMessage());
 			System.out.println(e.getCode());
 		}

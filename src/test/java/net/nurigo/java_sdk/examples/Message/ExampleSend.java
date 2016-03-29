@@ -36,7 +36,7 @@ public class ExampleSend {
 	    // params.put("charset", "euckr"); // For Korean language, set euckr or utf-8
 	    
 		try {
-			JSONObject obj = (JSONObject) coolsms.getStatus(params);
+			JSONObject obj = (JSONObject) coolsms.send(params);
 			System.out.println(obj.toString());
 		} catch (CoolsmsException e) {
 			System.out.println(e.getMessage());
