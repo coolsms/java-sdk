@@ -16,8 +16,8 @@ import org.junit.Test;
 
 
 public class CoolsmsUnitTest {
-	String api_key = "CS56FA79F8AD35B";
-	String api_secret = "33D8D055C7DA53F45404941B6BD7900D";
+	String api_key = "NCS558104628ADED";
+	String api_secret = "983C21FB95000DCBD2A1C4FE25F14883";
 	
 	Message message = new Message(api_key, api_secret);
 	GroupMessage groupMessage = new GroupMessage(api_key, api_secret);
@@ -36,10 +36,10 @@ public class CoolsmsUnitTest {
 		    params.put("from", "01000000000");
 		    params.put("type", "SMS");
 		    params.put("text", "Coolsms Testing Message!");
-		    params.put("mode", "test");     
-		    
-		    result = message.send(params);		    
-		    assertEquals(result.get("result_message"), "Success");
+		    params.put("mode", "test");     		    
+		    result = message.send(params);
+		    System.out.println(result);
+		    assertEquals(result.get("result_message"), "Success");		    
 		    
 			// balance
 			result = message.balance();
@@ -47,8 +47,13 @@ public class CoolsmsUnitTest {
 			
 			// sent
 			params.clear();
-			result = message.sent(params);
-			assertNotNull(result.get("data"));
+			try {
+				result = message.sent(params);				
+				assertNotNull(result.get("data"));			
+			} catch(Exception e) {
+				result = (JSONObject) JSONValue.parse(e.getMessage());				
+				assertEquals(result.get("code"), "NoSuchMessage");
+			}		
 			
 			// status
 			result = message.getStatus(params);
@@ -57,7 +62,7 @@ public class CoolsmsUnitTest {
 			// cancel
 			params.put("mid", "MIDTEST");
 			result = message.cancel(params);			
-			assertTrue(result.isEmpty());				
+			assertTrue(!result.isEmpty());				
 		}catch(Exception e) {
 			fail(e.toString());
 		}
@@ -75,7 +80,7 @@ public class CoolsmsUnitTest {
 			params.put("mode", "test");
 			result = groupMessage.createGroup(params);
 			assertNotNull(result.get("group_id"));
-			group_id = (String) result.get("group_id");		
+			group_id = (String) result.get("group_id");
 			
 			// group info			
 			result = groupMessage.getGroupInfo(group_id);
@@ -84,18 +89,17 @@ public class CoolsmsUnitTest {
 			// group list
 			result = groupMessage.getGroupList();
 			assertNotNull(result.get("list"));
-			
+						
 			// add messages
 			params.clear();
 			params.put("to", "01000000000");
 			params.put("from", "01000000000");
 			params.put("text", "Coolsms Testing Message!");
-			params.put("group_id", group_id); // Group ID	    
-			result = groupMessage.addMessages(params);		
-			message_id = (String) result.get("message_id");
+			params.put("group_id", group_id); // Group ID
+			result = groupMessage.addMessages(params);
 			success_count = Integer.parseInt(result.get("success_count").toString());
 			assertNotEquals(success_count, 0);
-						
+
 			// message list
 			params.clear();
 			params.put("group_id", group_id);
@@ -103,7 +107,7 @@ public class CoolsmsUnitTest {
 			assertNotNull(result.get("list"));
 			result_array = (JSONArray) result.get("list");
 			result_array.get(0);
-			message_id = (String) result_array.get(0);			
+			message_id = (String) result_array.get(0);
 			
 			// send
 			result = groupMessage.sendGroupMessage(group_id);
@@ -111,13 +115,14 @@ public class CoolsmsUnitTest {
 			
 			// delete messages
 			result = groupMessage.deleteMessages(group_id, message_id);
-			// 이 부분은 테스트 하면서 고쳐야 할듯 null값으로 넘어옴 
+			success_count = Integer.parseInt(result.get("success_count").toString());
+			assertNotEquals(success_count, 0);
 			
 			// delete group
 			result = groupMessage.deleteGroups(group_id);
 			success_count = Integer.parseInt(result.get("success_count").toString());
 			assertNotEquals(success_count, 0);			
-		} catch (Exception e) {
+		} catch (Exception e) {			
 			fail(e.toString());
 		}
 	}
