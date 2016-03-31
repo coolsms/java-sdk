@@ -194,7 +194,7 @@ public class Coolsms {
 			// casting JSONObject or JSONArray
 			try {
 				// get response data
-				response = getHttpsResponse(connection);	
+				response = getHttpsResponse(connection);				
 				obj = (JSONObject) JSONValue.parse(response);				
 			} catch (ClassCastException e) {
 				try {

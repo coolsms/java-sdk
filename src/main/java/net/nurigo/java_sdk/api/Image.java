@@ -40,7 +40,7 @@ public class Image extends Coolsms {
 	 */
 	public JSONObject getImageInfo(String image_id) throws CoolsmsException {		
 		HashMap<String, String> params = new HashMap<String, String>();
-		String resource = "image/" + image_id;
+		String resource = "images/" + image_id;
 		return request(resource, params);
 	}
 

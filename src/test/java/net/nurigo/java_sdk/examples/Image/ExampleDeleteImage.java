@@ -16,7 +16,7 @@ public class ExampleDeleteImage {
 		Image coolsms = new Image(api_key, api_secret);
 		
 		// image_ids are mandatory
-		String image_ids = "";  // image ids. ex)'IM34BWIDJ12','IMG2559GBB'
+		String image_ids = "IMG56fce743e4daa,IMG56fce598851bc";  // image ids. ex)'IM34BWIDJ12','IMG2559GBB'
 		
 		try {
 			JSONObject obj = (JSONObject) coolsms.deleteImages(image_ids);
