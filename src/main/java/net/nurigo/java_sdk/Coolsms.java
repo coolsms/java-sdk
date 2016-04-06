@@ -171,7 +171,7 @@ public class Coolsms {
 
 			// remove api_secret
 			params.remove("api_secret");		
-			
+
 			// set contents
 			for (Entry<String, String> entry : params.entrySet()) {				
 				String key = entry.getKey();
@@ -187,14 +187,14 @@ public class Coolsms {
 			}
 
 			URL url = new URL(data);
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection(); 
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
 			String response = null;
 
 			// casting JSONObject or JSONArray
 			try {
 				// get response data
-				response = getHttpsResponse(connection);				
+				response = getHttpsResponse(connection);	
 				obj = (JSONObject) JSONValue.parse(response);				
 			} catch (ClassCastException e) {
 				try {
@@ -374,11 +374,11 @@ public class Coolsms {
 			} else {
 				in = new BufferedReader(new InputStreamReader(connection.getInputStream()));				
 			}	
-			
+
 			while ((inputLine = in.readLine()) != null) {					
 				response = inputLine;
 			}			
-			
+
 			// response code is not 200, throw CoolsmsServerException
 			if (response_code != 200) throw new CoolsmsServerException(response, response_code);
 		} catch (Exception e) {

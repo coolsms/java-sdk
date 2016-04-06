@@ -16,10 +16,11 @@ public class ExampleUploadImage {
 		String api_key = "CS558104628ADED";
 		String api_secret = "983C21FB95000DCBD2A1C4FE25F14883";
 		Image coolsms = new Image(api_key, api_secret);		
+		System.out.println(System.getProperty("user.dir"));
 		
 		// Optional parameters for your own needs
 		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("image", "images/test.jpg"); // image
+		params.put("image", System.getProperty("user.dir") + "\\test.jpg"); // image
 		// params.put("encoding", "binary"); // image encoding type (base64, binary) default binary
 		// params.put("limit", "20"); // default 20
 		
