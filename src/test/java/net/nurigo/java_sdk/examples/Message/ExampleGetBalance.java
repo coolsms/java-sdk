@@ -11,7 +11,7 @@ import net.nurigo.java_sdk.exceptions.CoolsmsException;
  */
 public class ExampleGetBalance {
 	public static void main(String[] args) {
-		String api_key = "CS558104628ADED";
+		String api_key = "NCS558104628ADED";
 		String api_secret = "983C21FB95000DCBD2A1C4FE25F14883";
 		Message coolsms = new Message(api_key, api_secret);			
 			

@@ -17,8 +17,8 @@ public class SenderID extends Coolsms {
 	 * @brief constructor
 	 * @throws CoolsmsException
 	 */	
-	public SenderID(String api_key, String api_secret) throws CoolsmsException {
-		super(api_key, api_secret);
+	public SenderID(String apiKey, String apiSecret) throws CoolsmsException {
+		super(apiKey, apiSecret);
 
 		// set API and version
 		setApiConfig("senderid", "1.1");
@@ -40,30 +40,30 @@ public class SenderID extends Coolsms {
 
 	/**
 	 * @brief verify sender id ( HTTP Method POST )
-	 * @param string handle_key [required]
+	 * @param string handleKey [required]
 	 * @return None
 	 * @throws CoolsmsException
 	 */
-	public JSONObject verify(String handle_key) throws CoolsmsException {		
-		if (!checkString(handle_key)) throw new CoolsmsSDKException("handle_key is required", 202);	
+	public JSONObject verify(String handleKey) throws CoolsmsException {		
+		if (!checkString(handleKey)) throw new CoolsmsSDKException("handle_key is required", 202);	
 
 		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("handle_key", handle_key);				
+		params.put("handle_key", handleKey);				
 
 		return postRequest("verify", params);
 	}
 
 	/**
 	 * @brief delete sender id ( HTTP Method POST )
-	 * @param string handle_key [required]
+	 * @param string handleKey [required]
 	 * @return None
 	 * @throws CoolsmsException
 	 */
-	public JSONObject delete(String handle_key) throws CoolsmsException {
-		if (!checkString(handle_key)) throw new CoolsmsSDKException("handle_key is required", 202);
+	public JSONObject delete(String handleKey) throws CoolsmsException {
+		if (!checkString(handleKey)) throw new CoolsmsSDKException("handle_key is required", 202);
 
 		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("handle_key", handle_key);		
+		params.put("handle_key", handleKey);		
 
 		return postRequest("delete", params);
 	}

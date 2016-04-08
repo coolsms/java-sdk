@@ -47,26 +47,29 @@ public class Coolsms {
 	final String SDK_VERSION = "1.0";
 
 	/** api name & api version */
-	private String api_name = "sms";
-	private String api_version = "2";	
+	private String apiName = "sms";
+	private String apiVersion = "2";	
 
 	/** need for authentication  */
 	private String salt;
 	private String timestamp;
 	private String signature;
-	private String api_key;
-	private String api_secret;		
+	private String apiKey;
+	private String apiSecret;		
+	
+	/** connection type */
+	boolean useHttp = false;
 
 	/**
-	 * @brief set api_key, api_secret
-	 * @param string api_key [required]
-	 * @param string api_secret [required]
+	 * @brief set apiKey, apiSecret
+	 * @param string apiKey [required]
+	 * @param string apiSecret [required]
 	 */
-	public Coolsms(String api_key, String api_secret) {
+	public Coolsms(String apiKey, String apiSecret) {
 		// disable SNI. Java 1.7 bug
-		System.setProperty("jsse.enableSNIExtension", "false") ;
-		this.api_key = api_key;
-		this.api_secret = api_secret;
+		System.setProperty("jsse.enableSNIExtension", "false");
+		this.apiKey = apiKey;
+		this.apiSecret = apiSecret;
 	}
 
 	/**
@@ -165,9 +168,9 @@ public class Coolsms {
 		try {
 			// set base info
 			params = setBaseInfo(params);		
-			String charset = "UTF8";			
+			String charset = "UTF-8";			
 			String data = getResourceUrl(resource) + "?";
-			data = data + URLEncoder.encode("api_key", charset) + "=" + URLEncoder.encode(this.api_key, charset);
+			data = data + URLEncoder.encode("api_key", charset) + "=" + URLEncoder.encode(this.apiKey, charset);
 
 			// remove api_secret
 			params.remove("api_secret");		
@@ -182,7 +185,7 @@ public class Coolsms {
 
 				data = setGetData(data, key, value, charset);
 				if(data == null) {
-					throw new CoolsmsSDKException("params is something wrong.", 201);				
+					throw new CoolsmsSDKException("params is something wrong, key : " + key + " value : " + value, 201);				
 				}
 			}
 
@@ -220,8 +223,8 @@ public class Coolsms {
 	public void setApiConfig(String api_name, String api_version) throws CoolsmsException
 	{
 		if (!checkString(api_name) || !checkString(api_version)) throw new CoolsmsSDKException("API name and version is requried", 201);
-		this.api_name = api_name;
-		this.api_version = api_version;
+		this.apiName = api_name;
+		this.apiVersion = api_version;
 	}
 
 	/**	 
@@ -235,9 +238,9 @@ public class Coolsms {
 
 		this.salt = salt();
 		this.timestamp = getTimestamp();
-		this.signature = getSignature(this.api_secret, salt, timestamp); // getSignature
+		this.signature = getSignature(this.apiSecret, salt, timestamp); // getSignature
 
-		params.put("api_key", this.api_key);
+		params.put("api_key", this.apiKey);
 		params.put("salt", this.salt);
 		params.put("signature", this.signature);
 		params.put("timestamp", this.timestamp);		
@@ -308,8 +311,8 @@ public class Coolsms {
 	 * @return string
 	 */
 	private String getResourceUrl(String resource) {		
-		String resource_url = String.format("%s/%s/%s/%s", this.URL, this.api_name, this.api_version, resource);		
-		return resource_url;
+		String resourceUrl = String.format("%s/%s/%s/%s", this.URL, this.apiName, this.apiVersion, resource);		
+		return resourceUrl;
 	}
 
 	/**
@@ -319,15 +322,16 @@ public class Coolsms {
 	 * @return string
 	 * @throws CoolsmsException 
 	 */
-	public String getSignature(String api_secret, String salt, String timestamp) throws CoolsmsException {
+	public String getSignature(String apiSecret, String salt, String timestamp) throws CoolsmsException {
 		String signature = "";
 
 		try {
 			String temp = timestamp + salt;
-			SecretKeySpec keySpec = new SecretKeySpec(api_secret.getBytes(), "HmacMD5");
+			SecretKeySpec keySpec = new SecretKeySpec(apiSecret.getBytes(), "HmacMD5");
 			Mac mac = Mac.getInstance("HmacMD5");
 			mac.init(keySpec);
 
+			// 바이너리를 hex로 변환
 			byte[] result = mac.doFinal(temp.getBytes());
 			char[] hexArray = "0123456789ABCDEF".toCharArray();
 			char[] hexChars = new char[result.length * 2];
@@ -362,14 +366,14 @@ public class Coolsms {
 	 * @throws CoolsmsServerException 
 	 */	
 	public String getHttpsResponse(HttpURLConnection connection) throws CoolsmsServerException {
-		int response_code = 0;
+		int responseCode = 0;
 		String response = null;
 		String inputLine = null;		
 		BufferedReader in = null;
 		JSONObject obj = new JSONObject();		
 		try {
-			response_code = connection.getResponseCode();			
-			if (response_code != 200) {
+			responseCode = connection.getResponseCode();			
+			if (responseCode != 200) {
 				in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
 			} else {
 				in = new BufferedReader(new InputStreamReader(connection.getInputStream()));				
@@ -380,9 +384,9 @@ public class Coolsms {
 			}			
 
 			// response code is not 200, throw CoolsmsServerException
-			if (response_code != 200) throw new CoolsmsServerException(response, response_code);
+			if (responseCode != 200) throw new CoolsmsServerException(response, responseCode);
 		} catch (Exception e) {
-			throw new CoolsmsServerException(e.getMessage(), response_code);
+			throw new CoolsmsServerException(e.getMessage(), responseCode);
 		}
 
 		return response;

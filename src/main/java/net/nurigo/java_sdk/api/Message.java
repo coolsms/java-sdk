@@ -16,8 +16,8 @@ public class Message extends Coolsms {
 	/**
 	 * @brief constructor
 	 */	
-	public Message(String api_key, String api_secret) {
-		super(api_key, api_secret);		
+	public Message(String apiKey, String apiSecret) {
+		super(apiKey, apiSecret);		
 	}
 
 	/**

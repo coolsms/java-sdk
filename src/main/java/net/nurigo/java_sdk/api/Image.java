@@ -16,8 +16,8 @@ public class Image extends Coolsms {
 	/**
 	 * @brief constructor
 	 */	
-	public Image(String api_key, String api_secret) {
-		super(api_key, api_secret);		
+	public Image(String apiKey, String apiSecret) {
+		super(apiKey, apiSecret);		
 	}
 
 	/**
@@ -34,13 +34,13 @@ public class Image extends Coolsms {
 
 	/**
 	 * @brief get image info ( HTTP Method GET )
-	 * @param string image_id [required]
+	 * @param string imageID [required]
 	 * @return JSONObject
 	 * @throws CoolsmsException
 	 */
-	public JSONObject getImageInfo(String image_id) throws CoolsmsException {		
+	public JSONObject getImageInfo(String imageID) throws CoolsmsException {		
 		HashMap<String, String> params = new HashMap<String, String>();
-		String resource = "images/" + image_id;
+		String resource = "images/" + imageID;
 		return request(resource, params);
 	}
 
@@ -59,15 +59,15 @@ public class Image extends Coolsms {
 
 	/**
 	 * @brief delete images ( HTTP Method POST )
-	 * @param string image_ids [required]
+	 * @param string imageIDs [required]
 	 * @return JSONObject
 	 * @throws CoolsmsException 
 	 */
-	public JSONObject deleteImages(String image_ids) throws CoolsmsException {		
-		if (!checkString(image_ids)) throw new CoolsmsSDKException("image_ids is required", 202);
+	public JSONObject deleteImages(String imageIDs) throws CoolsmsException {		
+		if (!checkString(imageIDs)) throw new CoolsmsSDKException("image_ids is required", 202);
 
 		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("image_ids", image_ids);
+		params.put("image_ids", imageIDs);
 		return postRequest("delete_images", params);
 	}
 }

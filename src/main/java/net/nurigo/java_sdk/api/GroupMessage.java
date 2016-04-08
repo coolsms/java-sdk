@@ -16,8 +16,8 @@ public class GroupMessage extends Coolsms {
 	/**
 	 * @brief constructor
 	 */	
-	public GroupMessage(String api_key, String api_secret) {
-		super(api_key, api_secret);		
+	public GroupMessage(String apiKey, String apiSecret) {
+		super(apiKey, apiSecret);		
 	}
 
 	/**
@@ -53,31 +53,31 @@ public class GroupMessage extends Coolsms {
 
 	/**
 	 * @brief delete groups ( HTTP Method POST )
-	 * @param string group_ids [required]
+	 * @param string groupIDs [required]
 	 * @return JSONobject
 	 * @throws CoolsmsException
 	 */
-	public JSONObject deleteGroups(String group_ids) throws CoolsmsException {
-		if (!checkString(group_ids)) throw new CoolsmsSDKException("group_ids is required", 202);
+	public JSONObject deleteGroups(String groupIDs) throws CoolsmsException {
+		if (!checkString(groupIDs)) throw new CoolsmsSDKException("group_ids is required", 202);
 
 		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("group_ids", group_ids);		
+		params.put("group_ids", groupIDs);		
 
 		return postRequest("delete_groups", params);		
 	}
 
 	/**
 	 * @brief get group info ( HTTP Method GET )
-	 * @param string group_id [required] 
+	 * @param string groupID [required] 
 	 * @return JSONObject
 	 * @throws CoolsmsException 
 	 */
-	public JSONObject getGroupInfo(String group_id) throws CoolsmsException {		
-		if (!checkString(group_id)) throw new CoolsmsSDKException("group_id is required", 202);
+	public JSONObject getGroupInfo(String groupID) throws CoolsmsException {		
+		if (!checkString(groupID)) throw new CoolsmsSDKException("group_id is required", 202);
 
 		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("group_id", group_id);
-		String resource = "groups/" + group_id;        
+		params.put("group_id", groupID);
+		String resource = "groups/" + groupID;        
 		return request(resource, params);
 	}
 
@@ -126,20 +126,20 @@ public class GroupMessage extends Coolsms {
 
 	/**
 	 * @brief delete message from group ( HTTP Method POST )
-	 * @param string group_id [required]
-	 * @param string message_ids [required]
+	 * @param string groupID [required]
+	 * @param string messageIDs [required]
 	 * @return JSONObject
 	 * @throws CoolsmsException 
 	 */
-	public JSONObject deleteMessages(String group_id, String message_ids) throws CoolsmsException 
+	public JSONObject deleteMessages(String groupID, String messageIDs) throws CoolsmsException 
 	{
-		if (!checkString(group_id) || !checkString(message_ids)) {
+		if (!checkString(groupID) || !checkString(messageIDs)) {
 			throw new CoolsmsSDKException("group_id and message_ids are required", 202);
 		}
 
 		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("group_id", group_id);
-		params.put("message_ids", message_ids);
+		params.put("group_id", groupID);
+		params.put("message_ids", messageIDs);
 
 		String resource = "groups/" + params.get("group_id") + "/delete_messages";        
 		return postRequest(resource, params);
@@ -147,16 +147,16 @@ public class GroupMessage extends Coolsms {
 
 	/**
 	 * @brief send group message ( HTTP Method POST )
-	 * @param string group_id [required]
+	 * @param string groupID [required]
 	 * @return JSONObject
 	 * @throws CoolsmsException 
 	 */
-	public JSONObject sendGroupMessage(String group_id) throws CoolsmsException 
+	public JSONObject sendGroupMessage(String groupID) throws CoolsmsException 
 	{
-		if (!checkString(group_id)) throw new CoolsmsSDKException("group_id is required", 202);
+		if (!checkString(groupID)) throw new CoolsmsSDKException("group_id is required", 202);
 
 		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("group_id", group_id);		
+		params.put("group_id", groupID);		
 
 		String resource = "groups/" + params.get("group_id") + "/send";        
 		return postRequest(resource, params);       
