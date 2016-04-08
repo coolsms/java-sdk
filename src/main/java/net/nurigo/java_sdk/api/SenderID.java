@@ -35,7 +35,7 @@ public class SenderID extends Coolsms {
 	public JSONObject register(HashMap<String, String> params)  throws CoolsmsException {
 		if (!checkString(params.get("phone"))) throw new CoolsmsSDKException("phone number is required", 202);	
 
-		return postRequest("register", params);		
+		return sendPostRequest("register", params);		
 	}
 
 	/**
@@ -50,7 +50,7 @@ public class SenderID extends Coolsms {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("handle_key", handleKey);				
 
-		return postRequest("verify", params);
+		return sendPostRequest("verify", params);
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class SenderID extends Coolsms {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("handle_key", handleKey);		
 
-		return postRequest("delete", params);
+		return sendPostRequest("delete", params);
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class SenderID extends Coolsms {
 	 * @throws CoolsmsException 
 	 */
 	public JSONObject getSenderidList(HashMap<String, String> params) throws CoolsmsException {		
-		return request("list", params);
+		return sendGetRequest("list", params);
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class SenderID extends Coolsms {
 	{    	
 		if (!checkString(params.get("handle_key"))) throw new CoolsmsSDKException("handle_key is required", 202);    
 
-		return postRequest("set_default", params);
+		return sendPostRequest("set_default", params);
 	}
 
 	/**
@@ -103,6 +103,6 @@ public class SenderID extends Coolsms {
 	 */
 	public JSONObject getDefault(HashMap<String, String> params) throws CoolsmsException
 	{		
-		return request("get_default", params);
+		return sendGetRequest("get_default", params);
 	}
 }

@@ -36,7 +36,7 @@ public class GroupMessage extends Coolsms {
 	 * @throws CoolsmsException
 	 */
 	public JSONObject createGroup(HashMap<String, String> params)  throws CoolsmsException {
-		return request("new_group", params);		
+		return sendGetRequest("new_group", params);		
 	}
 
 	/**
@@ -48,7 +48,7 @@ public class GroupMessage extends Coolsms {
 	public JSONObject getGroupList() throws CoolsmsException {		
 		// resource 'balance' does not required params so hand over empty params.
 		HashMap<String, String> params = new HashMap<String, String>();		
-		return request("group_list", params);		
+		return sendGetRequest("group_list", params);		
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class GroupMessage extends Coolsms {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("group_ids", groupIDs);		
 
-		return postRequest("delete_groups", params);		
+		return sendPostRequest("delete_groups", params);		
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class GroupMessage extends Coolsms {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("group_id", groupID);
 		String resource = "groups/" + groupID;        
-		return request(resource, params);
+		return sendGetRequest(resource, params);
 	}
 
 	/**
@@ -104,7 +104,7 @@ public class GroupMessage extends Coolsms {
 		}
 
 		String resource = "groups/" + params.get("group_id") + "/add_messages";        
-		return postRequest(resource, params);
+		return sendPostRequest(resource, params);
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class GroupMessage extends Coolsms {
 		if (!checkString(params.get("group_id"))) throw new CoolsmsSDKException("group_id is required", 202);
 
 		String resource = "groups/" + params.get("group_id") + "/message_list";        
-		return request(resource, params);
+		return sendGetRequest(resource, params);
 	}
 
 	/**
@@ -142,7 +142,7 @@ public class GroupMessage extends Coolsms {
 		params.put("message_ids", messageIDs);
 
 		String resource = "groups/" + params.get("group_id") + "/delete_messages";        
-		return postRequest(resource, params);
+		return sendPostRequest(resource, params);
 	}
 
 	/**
@@ -159,6 +159,6 @@ public class GroupMessage extends Coolsms {
 		params.put("group_id", groupID);		
 
 		String resource = "groups/" + params.get("group_id") + "/send";        
-		return postRequest(resource, params);       
+		return sendPostRequest(resource, params);       
 	}
 }

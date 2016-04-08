@@ -29,7 +29,7 @@ public class Image extends Coolsms {
 	 * @throws CoolsmsException
 	 */
 	public JSONObject getImageList(HashMap<String, String> params)  throws CoolsmsException {		
-		return request("image_list", params);
+		return sendGetRequest("image_list", params);
 	}
 
 	/**
@@ -41,7 +41,7 @@ public class Image extends Coolsms {
 	public JSONObject getImageInfo(String imageID) throws CoolsmsException {		
 		HashMap<String, String> params = new HashMap<String, String>();
 		String resource = "images/" + imageID;
-		return request(resource, params);
+		return sendGetRequest(resource, params);
 	}
 
 	/**
@@ -54,7 +54,7 @@ public class Image extends Coolsms {
 	 */
 	public JSONObject uploadImage(HashMap<String, String> params) throws CoolsmsException {
 		if (!checkString(params.get("image"))) throw new CoolsmsSDKException("image is required", 202);		
-		return postRequest("upload_image", params);		
+		return sendPostRequest("upload_image", params);		
 	}
 
 	/**
@@ -68,6 +68,6 @@ public class Image extends Coolsms {
 
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("image_ids", imageIDs);
-		return postRequest("delete_images", params);
+		return sendPostRequest("delete_images", params);
 	}
 }

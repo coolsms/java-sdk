@@ -44,7 +44,7 @@ public class Message extends Coolsms {
 	 * @throws CoolsmsException
 	 */
 	public JSONObject send(HashMap<String, String> params)  throws CoolsmsException {
-		return postRequest("send", params);		
+		return sendPostRequest("send", params);		
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class Message extends Coolsms {
 	 * @throws CoolsmsException
 	 */
 	public JSONObject sent(HashMap<String, String> params) throws CoolsmsException {		
-		return request("sent", params);		
+		return sendGetRequest("sent", params);		
 	}
 
 	/**
@@ -79,7 +79,7 @@ public class Message extends Coolsms {
 	public JSONObject cancel(HashMap<String, String> params) throws CoolsmsException {
 		if (!checkString(params.get("mid")) && !checkString(params.get("gid"))) throw new CoolsmsSDKException("mid or gid either one must be entered", 202);
 
-		return postRequest("cancel", params);		
+		return sendPostRequest("cancel", params);		
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class Message extends Coolsms {
 	public JSONObject balance() throws CoolsmsException {		
 		// resource 'balance' does not required params so hand over empty params.
 		HashMap<String, String> params = new HashMap<String, String>();
-		return request("balance", params);
+		return sendGetRequest("balance", params);
 	}
 
 	/**
@@ -105,6 +105,6 @@ public class Message extends Coolsms {
 	 * @throws CoolsmsException
 	 */
 	public JSONObject getStatus(HashMap<String, String> params) throws CoolsmsException {		
-		return request("status", params);		
+		return sendGetRequest("status", params);		
 	}
 }

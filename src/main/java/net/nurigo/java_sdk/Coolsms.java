@@ -73,13 +73,13 @@ public class Coolsms {
 	}
 
 	/**
-	 * @brief postRequest (POST)
+	 * @brief sendPostRequest (POST)
 	 * @param string resource [required]
 	 * @param hashmap<string, string> params [required]
 	 * @return JSONObject
 	 * @throws CoolsmsException 
 	 */
-	public JSONObject postRequest(String resource, HashMap<String, String> params) throws CoolsmsException {		
+	public JSONObject sendPostRequest(String resource, HashMap<String, String> params) throws CoolsmsException {		
 		JSONObject obj = new JSONObject();
 
 		// set base info
@@ -98,7 +98,7 @@ public class Coolsms {
 			String key = entry.getKey();
 			String value = entry.getValue();
 
-			// if key is image. continue
+			// if key is image. process below
 			if (key == "image") continue;	
 			postDataBuilder = setPostData(postDataBuilder, key, value, delimiter);
 		}
@@ -107,9 +107,9 @@ public class Coolsms {
 			// start https connection	
 			URL url = new URL(getResourceUrl(resource));
 			//HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setDoInput(true);
-			connection.setDoOutput(true);
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();			
+			connection.setDoInput(true); // Server에서 온 데이터를 입력 받을 수 있도록			
+			connection.setDoOutput(true); // Server에서 온 데이터를 출력 할수 있도록
 			connection.setRequestMethod("POST");
 			connection.setRequestProperty("Connection", "Keep-Alive");
 			connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
@@ -117,7 +117,7 @@ public class Coolsms {
 			DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(connection.getOutputStream()));
 
 			// set image data 
-			if(params.get("image") != null) {
+			if (params.get("image") != null) {
 				// set image file 
 				postDataBuilder.append(setFile("image", params.get("image")));	
 				postDataBuilder.append("\r\n");				
@@ -146,49 +146,52 @@ public class Coolsms {
 
 			// get response data
 			String response = getHttpsResponse(connection);
-			if (response == null) return obj;			
-			obj = (JSONObject) JSONValue.parse(response);						
+			if (response != null) obj = (JSONObject) JSONValue.parse(response);
 		} catch (IOException e) {
 			throw new CoolsmsSystemException(e.getMessage(), 399);
 		}
 
 		return obj;
-	}		
+	}
 
 	/**
-	 * @brief https request ( GET )
+	 * @brief https sendGetRequest ( GET )
 	 * @param string resource [required]
 	 * @param hashmap<string, string> params [required]
 	 * @return JSONObject
 	 * @throws CoolsmsException 
 	 */
-	public JSONObject request(String resource, HashMap<String, String> params) throws CoolsmsException {		
+	public JSONObject sendGetRequest(String resource, HashMap<String, String> params) throws CoolsmsException {		
 		JSONObject obj = new JSONObject();
 
+		// set base info
+		params = setBaseInfo(params);		
+		String charset = "UTF-8";			
+		String data = getResourceUrl(resource) + "?";
 		try {
-			// set base info
-			params = setBaseInfo(params);		
-			String charset = "UTF-8";			
-			String data = getResourceUrl(resource) + "?";
 			data = data + URLEncoder.encode("api_key", charset) + "=" + URLEncoder.encode(this.apiKey, charset);
+		} catch (UnsupportedEncodingException e) {
+			throw new CoolsmsSystemException(e.getMessage(), 399);
+		}
 
-			// remove api_secret
-			params.remove("api_secret");		
+		// remove api_secret
+		params.remove("api_secret");		
 
-			// set contents
-			for (Entry<String, String> entry : params.entrySet()) {				
-				String key = entry.getKey();
-				String value = entry.getValue();
+		// set contents
+		for (Entry<String, String> entry : params.entrySet()) {				
+			String key = entry.getKey();
+			String value = entry.getValue();
 
-				// api_key 는 위에서 넣어줬기 때문에 continue
-				if (key == "api_key") continue;
+			// api_key 는 위에서 넣어줬기 때문에 continue
+			if (key == "api_key") continue;
 
-				data = setGetData(data, key, value, charset);
-				if(data == null) {
-					throw new CoolsmsSDKException("params is something wrong, key : " + key + " value : " + value, 201);				
-				}
+			data = setGetData(data, key, value, charset);
+			if (data == null) {
+				throw new CoolsmsSDKException("params is something wrong, key : " + key + " value : " + value, 201);				
 			}
+		}
 
+		try {
 			URL url = new URL(data);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
@@ -209,7 +212,7 @@ public class Coolsms {
 			}						
 		} catch (IOException e) {
 			throw new CoolsmsSystemException(e.getMessage(), 399);
-		}		
+		}
 
 		return obj;
 	}
@@ -236,7 +239,7 @@ public class Coolsms {
 	private HashMap<String, String> setBaseInfo(HashMap<String, String> params) throws CoolsmsException {
 		Properties properties = System.getProperties();
 
-		this.salt = salt();
+		this.salt = getSalt();
 		this.timestamp = getTimestamp();
 		this.signature = getSignature(this.apiSecret, salt, timestamp); // getSignature
 
@@ -363,40 +366,41 @@ public class Coolsms {
 	 * @brief get https response
 	 * @param httpurlconnection api_key [required]
 	 * @return string
-	 * @throws CoolsmsServerException 
+	 * @throws CoolsmsException 
 	 */	
-	public String getHttpsResponse(HttpURLConnection connection) throws CoolsmsServerException {
+	public String getHttpsResponse(HttpURLConnection connection) throws CoolsmsException {
 		int responseCode = 0;
-		String response = null;
+		String responseBody = null;
 		String inputLine = null;		
 		BufferedReader in = null;
-		JSONObject obj = new JSONObject();		
+		JSONObject obj = new JSONObject();
+		
 		try {
 			responseCode = connection.getResponseCode();			
 			if (responseCode != 200) {
 				in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
 			} else {
 				in = new BufferedReader(new InputStreamReader(connection.getInputStream()));				
-			}	
+			}
 
 			while ((inputLine = in.readLine()) != null) {					
-				response = inputLine;
+				responseBody = inputLine;
 			}			
 
 			// response code is not 200, throw CoolsmsServerException
-			if (responseCode != 200) throw new CoolsmsServerException(response, responseCode);
+			if (responseCode != 200) throw new CoolsmsServerException(responseBody, responseCode);
 		} catch (Exception e) {
-			throw new CoolsmsServerException(e.getMessage(), responseCode);
+			throw new CoolsmsSystemException(e.getMessage(), 302);
 		}
 
-		return response;
+		return responseBody;
 	}
 
 	/**
 	 * @brief get salt data
 	 * @return string
 	 */
-	public String salt() {
+	public String getSalt() {
 		String uniqId = "";
 		Random randomGenerator = new Random();
 
