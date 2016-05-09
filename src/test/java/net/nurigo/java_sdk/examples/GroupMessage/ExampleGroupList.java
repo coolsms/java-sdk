@@ -13,8 +13,8 @@ import net.nurigo.java_sdk.exceptions.CoolsmsException;
  */
 public class ExampleGroupList {
   public static void main(String[] args) {
-    String api_key = "NCS558104628ADED";
-    String api_secret = "983C21FB95000DCBD2A1C4FE25F14883";
+    String api_key = "#ENTER_YOUR_OWN#";
+    String api_secret = "#ENTER_YOUR_OWN#";
     GroupMessage coolsms = new GroupMessage(api_key, api_secret);
 
     try {
