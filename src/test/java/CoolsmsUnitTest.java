@@ -15,8 +15,8 @@ import org.json.simple.JSONValue;
 import org.junit.Test;
 
 public class CoolsmsUnitTest {
-  String api_key = "NCS558104628ADED";
-  String api_secret = "983C21FB95000DCBD2A1C4FE25F14883";
+  String api_key = "#ENTER_YOUR_OWN#";
+  String api_secret = "#ENTER_YOUR_OWN#";
 
   Message message = new Message(api_key, api_secret);
   GroupMessage groupMessage = new GroupMessage(api_key, api_secret);
