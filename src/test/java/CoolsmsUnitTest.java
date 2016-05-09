@@ -30,8 +30,8 @@ public class CoolsmsUnitTest {
   public void MessageTest() {
     try {
       // send					
-      params.put("to", "01090683469");
-      params.put("from", "01090683469");
+      params.put("to", "01000000000");
+      params.put("from", "01000000000");
       params.put("type", "SMS");
       params.put("text", "Coolsms Testing Message!");
       params.put("mode", "test");
