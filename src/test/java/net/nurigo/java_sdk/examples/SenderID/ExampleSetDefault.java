@@ -12,25 +12,25 @@ import net.nurigo.java_sdk.exceptions.CoolsmsException;
  * @brief This sample code demonstrate how to set default sender number through CoolSMS Rest API PHP
  */
 public class ExampleSetDefault {
-	public static void main(String[] args) {
-		String api_key = "CS558104628ADED";
-		String api_secret = "983C21FB95000DCBD2A1C4FE25F14883";
-		
-		try {
-			SenderID coolsms = new SenderID(api_key, api_secret);		
+  public static void main(String[] args) {
+    String api_key = "#ENTER_YOUR_OWN#";
+    String api_secret = "#ENTER_YOUR_OWN#";
 
-			// handle_key are mandatory
-			HashMap<String, String> params = new HashMap<String, String>();			
-			params.put("handle_key", "SID56FA3A1266426"); // sender number handle key. check for 'ExampleSenderIdList' 
-			
-			// Optional parameters for your own needs
-			// params.put("site_user", "admin"); // site user id. '__private__' is default
-			
-			JSONObject obj = (JSONObject) coolsms.setDefault(params);
-			System.out.println(obj.toString());
-		} catch (CoolsmsException e) {
-			System.out.println(e.getMessage());
-			System.out.println(e.getCode());
-		}
-	}
+    try {
+      SenderID coolsms = new SenderID(api_key, api_secret);
+
+      // handle_key are mandatory
+      HashMap<String, String> params = new HashMap<String, String>();
+      params.put("handle_key", "SID56FA3A1266426"); // sender number handle key. check for 'ExampleSenderIdList' 
+
+      // Optional parameters for your own needs
+      // params.put("site_user", "admin"); // site user id. '__private__' is default
+
+      JSONObject obj = (JSONObject) coolsms.setDefault(params);
+      System.out.println(obj.toString());
+    } catch (CoolsmsException e) {
+      System.out.println(e.getMessage());
+      System.out.println(e.getCode());
+    }
+  }
 }
