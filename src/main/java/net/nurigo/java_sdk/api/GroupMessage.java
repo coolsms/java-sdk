@@ -108,7 +108,7 @@ public class GroupMessage extends Coolsms {
     String resource = "groups/" + params.get("group_id") + "/add_messages";
     return sendPostRequest(resource, params);
   }
-  
+
   /**
    * @brief add json type message to group ( HTTP Method POST )
    * @param string group_id [required]
@@ -132,13 +132,14 @@ public class GroupMessage extends Coolsms {
 
     JSONObject item = null;
     for (int i = 0; i < messages.size(); i++) {
-      item = (JSONObject) messages.get(i);      
-      if (!checkString(item.get("to").toString()) || !checkString(item.get("text").toString()) || !checkString(item.get("from").toString())) throw new CoolsmsSDKException("to, from, text is required", 202);
+      item = (JSONObject) messages.get(i);
+      if (!checkString(item.get("to").toString()) || !checkString(item.get("text").toString()) || !checkString(item.get("from").toString()))
+        throw new CoolsmsSDKException("to, from, text is required", 202);
     }
 
     HashMap<String, String> params = new HashMap<String, String>();
     params.put("messages", messages.toString());
-    
+
     String resource = "groups/" + group_id + "/add_messages.json";
     return sendPostRequest(resource, params);
   }

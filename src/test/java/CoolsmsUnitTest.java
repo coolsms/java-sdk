@@ -86,7 +86,7 @@ public class CoolsmsUnitTest {
       // group list
       result = groupMessage.getGroupList();
       assertNotNull(result.get("list"));
-      
+
       System.out.println("groupid is " + result.toString());
 
       // add messages

@@ -80,7 +80,7 @@ public class Coolsms {
    * @throws CoolsmsException
    */
   public JSONObject sendPostRequest(String resource, HashMap<String, String> params) throws CoolsmsException {
-    JSONObject obj = new JSONObject();    
+    JSONObject obj = new JSONObject();
 
     // set base info
     params = setBaseInfo(params);
@@ -147,8 +147,9 @@ public class Coolsms {
 
       // get response data
       String response = getHttpsResponse(connection);
-      if (response == null) return obj;        
-      
+      if (response == null)
+        return obj;
+
       // casting JSONObject or JSONArray
       try {
         obj = (JSONObject) JSONValue.parse(response);
