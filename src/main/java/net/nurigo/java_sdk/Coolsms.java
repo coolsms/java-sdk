@@ -80,7 +80,7 @@ public class Coolsms {
    * @throws CoolsmsException
    */
   public JSONObject sendPostRequest(String resource, HashMap<String, String> params) throws CoolsmsException {
-    JSONObject obj = new JSONObject();
+    JSONObject obj = new JSONObject();    
 
     // set base info
     params = setBaseInfo(params);
@@ -147,8 +147,19 @@ public class Coolsms {
 
       // get response data
       String response = getHttpsResponse(connection);
-      if (response != null)
+      if (response == null) return obj;        
+      
+      // casting JSONObject or JSONArray
+      try {
         obj = (JSONObject) JSONValue.parse(response);
+      } catch (ClassCastException e) {
+        try {
+          JSONArray response_array = (JSONArray) JSONValue.parse(response);
+          obj.put("data", response_array);
+        } catch (Exception ex) {
+          throw new CoolsmsSystemException(ex.getMessage(), 302);
+        }
+      }
     } catch (IOException e) {
       throw new CoolsmsSystemException(e.getMessage(), 399);
     }
@@ -198,12 +209,10 @@ public class Coolsms {
       URL url = new URL(data);
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
-      String response = null;
+      String response = getHttpsResponse(connection);
 
       // casting JSONObject or JSONArray
       try {
-        // get response data
-        response = getHttpsResponse(connection);
         obj = (JSONObject) JSONValue.parse(response);
       } catch (ClassCastException e) {
         try {
