@@ -36,7 +36,7 @@ public class CoolsmsUnitTest {
       params.put("text", "Coolsms Testing Message!");
       params.put("mode", "test");
       result = message.send(params);
-      assertEquals(result.get("result_message"), "Success");
+      assertNotNull(result.get("group_id"));
 
       // balance
       result = message.balance();
@@ -65,6 +65,9 @@ public class CoolsmsUnitTest {
     }
   }
 
+  /**
+   * @brief [checklist] GroupMessage -> createGroup, getGroupInfo, getGroupList, addMessages, getMessageList, send
+   */
   @Test
   public void GroupMessageTest() {
     try {
@@ -86,8 +89,6 @@ public class CoolsmsUnitTest {
       // group list
       result = groupMessage.getGroupList();
       assertNotNull(result.get("list"));
-
-      System.out.println("groupid is " + result.toString());
 
       // add messages
       params.clear();
@@ -111,6 +112,45 @@ public class CoolsmsUnitTest {
       // send
       result = groupMessage.sendGroupMessage(group_id);
       assertNotNull(result.get("group_id"));
+    } catch (Exception e) {
+      fail(e.toString());
+    }
+  }
+
+  /**
+   * @biref [checklist] GroupMessage -> deleteMessages, deleteGroups
+   */
+  @Test
+  public void GroupMessageDeleteTest() {
+    try {
+      String group_id;
+      int success_count;
+      String message_id;
+
+      // create group
+      params.put("mode", "test");
+      result = groupMessage.createGroup(params);
+      assertNotNull(result.get("group_id"));
+      group_id = (String) result.get("group_id");
+
+      // add messages
+      params.clear();
+      params.put("to", "01000000000");
+      params.put("from", "01000000000");
+      params.put("text", "Coolsms Testing Message!");
+      params.put("group_id", group_id); // Group ID
+      result = groupMessage.addMessages(params);
+      success_count = Integer.parseInt(result.get("success_count").toString());
+      assertNotEquals(success_count, 0);
+
+      // message list
+      params.clear();
+      params.put("group_id", group_id);
+      result = groupMessage.getMessageList(params);
+      assertNotNull(result.get("list"));
+      result_array = (JSONArray) result.get("list");
+      result_array.get(0);
+      message_id = (String) result_array.get(0);
 
       // delete messages
       result = groupMessage.deleteMessages(group_id, message_id);

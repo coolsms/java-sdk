@@ -57,8 +57,9 @@ public class Coolsms {
   private String apiKey;
   private String apiSecret;
 
-  /** connection type */
+  /** connection type & charset */
   boolean useHttp = false;
+  String charset = "UTF-8";
 
   /**
    * @brief set apiKey, apiSecret
@@ -103,7 +104,7 @@ public class Coolsms {
         continue;
       postDataBuilder = setPostData(postDataBuilder, key, value, delimiter);
     }
-
+    
     try {
       // start https connection	
       URL url = new URL(getResourceUrl(resource));
@@ -180,10 +181,9 @@ public class Coolsms {
 
     // set base info
     params = setBaseInfo(params);
-    String charset = "UTF-8";
     String data = getResourceUrl(resource) + "?";
     try {
-      data = data + URLEncoder.encode("api_key", charset) + "=" + URLEncoder.encode(this.apiKey, charset);
+      data = data + URLEncoder.encode("api_key", this.charset) + "=" + URLEncoder.encode(this.apiKey, this.charset);
     } catch (UnsupportedEncodingException e) {
       throw new CoolsmsSystemException(e.getMessage(), 399);
     }
@@ -200,7 +200,7 @@ public class Coolsms {
       if (key == "api_key")
         continue;
 
-      data = setGetData(data, key, value, charset);
+      data = setGetData(data, key, value);
       if (data == null) {
         throw new CoolsmsSDKException("params is something wrong, key : " + key + " value : " + value, 201);
       }
@@ -306,9 +306,9 @@ public class Coolsms {
    * @return string
    * @throws CoolsmsException
    */
-  public String setGetData(String data, String key, String value, String charSet) throws CoolsmsException {
+  public String setGetData(String data, String key, String value) throws CoolsmsException {
     try {
-      data += "&" + URLEncoder.encode(key, charSet) + "=" + URLEncoder.encode(value, charSet);
+      data += "&" + URLEncoder.encode(key, this.charset) + "=" + URLEncoder.encode(value, this.charset);
     } catch (Exception e) {
       throw new CoolsmsSystemException(e.getMessage(), 302);
     }
@@ -427,6 +427,7 @@ public class Coolsms {
    * @return boolean
    */
   public boolean checkString(String str) {
+    str = str.trim();
     if (str == null || str.isEmpty())
       return false;
     return true;
