@@ -9,8 +9,14 @@ Send Message & Message Management using JAVA and REST API.
 The recommended way to install Coolsms JAVA SDK is through maven:
 
 ```bash
-test download example 
+<dependency>
+    <groupId>net.nurigo</groupId>
+    <artifactId>javaSDK</artifactId>
+    <version>0.1</version>
+</dependency>
 ```
+
+install url : http://search.maven.org/#search%7Cga%7C1%7Cnurigo
 
 ##Requirements
 
