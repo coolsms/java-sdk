@@ -12,7 +12,7 @@ The recommended way to install Coolsms JAVA SDK is through maven:
 <dependency>
     <groupId>net.nurigo</groupId>
     <artifactId>javaSDK</artifactId>
-    <version>0.1</version>
+    <version>2.0</version>
 </dependency>
 ```
 
