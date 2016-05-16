@@ -16,7 +16,7 @@ public class ExampleGetImageInfo {
     Image coolsms = new Image(api_key, api_secret);
 
     // image_id are mandatory
-    String image_id = "IMG56fce743e4daa"; // image id
+    String image_id = "IMG5734504C13BFB"; // image id
 
     try {
       JSONObject obj = (JSONObject) coolsms.getImageInfo(image_id);

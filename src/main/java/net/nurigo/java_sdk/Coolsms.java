@@ -25,6 +25,11 @@ import org.json.simple.JSONValue;
 import org.junit.Test;
 
 /**
+ * Copyright (C) 2008-2016 NURIGO \n
+ * http://www.coolsms.co.kr
+ */
+
+/**
  * @mainpage JAVA SDK
  * @section intro 소개
  *     - 소개 : Coolsms REST API 
@@ -32,7 +37,7 @@ import org.junit.Test;
  *     - 설명 : Coolsms REST API 를 이용 보다 빠르고 안전하게 문자메시지를 보낼 수 있는 JAVA로 만들어진 SDK 입니다.
  * @section CreateInfo 작성 정보
  *     - 작성자 : Nurigo
- *     - 작성일 : 2015/03/18 * 
+ *     - 작성일 : 2016/05/13 * 
  * @section common 기타 정보
  *     - 저작권 GPL v2
  */
@@ -44,7 +49,7 @@ import org.junit.Test;
 public class Coolsms {
   /** base resource url & sdk_version */
   final String URL = "http://14.63.186.175";
-  final String SDK_VERSION = "1.0";
+  final String SDK_VERSION = "2.0";
 
   /** api name & api version */
   private String apiName = "sms";
@@ -57,8 +62,9 @@ public class Coolsms {
   private String apiKey;
   private String apiSecret;
 
-  /** connection type */
+  /** connection type & charset */
   boolean useHttp = false;
+  String charset = "UTF-8";
 
   /**
    * @brief set apiKey, apiSecret
@@ -103,7 +109,7 @@ public class Coolsms {
         continue;
       postDataBuilder = setPostData(postDataBuilder, key, value, delimiter);
     }
-
+    
     try {
       // start https connection	
       URL url = new URL(getResourceUrl(resource));
@@ -147,8 +153,20 @@ public class Coolsms {
 
       // get response data
       String response = getHttpsResponse(connection);
-      if (response != null)
+      if (response == null)
+        return obj;
+
+      // casting JSONObject or JSONArray
+      try {
         obj = (JSONObject) JSONValue.parse(response);
+      } catch (ClassCastException e) {
+        try {
+          JSONArray response_array = (JSONArray) JSONValue.parse(response);
+          obj.put("data", response_array);
+        } catch (Exception ex) {
+          throw new CoolsmsSystemException(ex.getMessage(), 302);
+        }
+      }
     } catch (IOException e) {
       throw new CoolsmsSystemException(e.getMessage(), 399);
     }
@@ -168,10 +186,9 @@ public class Coolsms {
 
     // set base info
     params = setBaseInfo(params);
-    String charset = "UTF-8";
     String data = getResourceUrl(resource) + "?";
     try {
-      data = data + URLEncoder.encode("api_key", charset) + "=" + URLEncoder.encode(this.apiKey, charset);
+      data = data + URLEncoder.encode("api_key", this.charset) + "=" + URLEncoder.encode(this.apiKey, this.charset);
     } catch (UnsupportedEncodingException e) {
       throw new CoolsmsSystemException(e.getMessage(), 399);
     }
@@ -188,7 +205,7 @@ public class Coolsms {
       if (key == "api_key")
         continue;
 
-      data = setGetData(data, key, value, charset);
+      data = setGetData(data, key, value);
       if (data == null) {
         throw new CoolsmsSDKException("params is something wrong, key : " + key + " value : " + value, 201);
       }
@@ -198,12 +215,10 @@ public class Coolsms {
       URL url = new URL(data);
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
-      String response = null;
+      String response = getHttpsResponse(connection);
 
       // casting JSONObject or JSONArray
       try {
-        // get response data
-        response = getHttpsResponse(connection);
         obj = (JSONObject) JSONValue.parse(response);
       } catch (ClassCastException e) {
         try {
@@ -296,9 +311,9 @@ public class Coolsms {
    * @return string
    * @throws CoolsmsException
    */
-  public String setGetData(String data, String key, String value, String charSet) throws CoolsmsException {
+  public String setGetData(String data, String key, String value) throws CoolsmsException {
     try {
-      data += "&" + URLEncoder.encode(key, charSet) + "=" + URLEncoder.encode(value, charSet);
+      data += "&" + URLEncoder.encode(key, this.charset) + "=" + URLEncoder.encode(value, this.charset);
     } catch (Exception e) {
       throw new CoolsmsSystemException(e.getMessage(), 302);
     }
@@ -417,6 +432,7 @@ public class Coolsms {
    * @return boolean
    */
   public boolean checkString(String str) {
+    str = str.trim();
     if (str == null || str.isEmpty())
       return false;
     return true;

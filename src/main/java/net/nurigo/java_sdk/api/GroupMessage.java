@@ -6,6 +6,7 @@ import net.nurigo.java_sdk.Coolsms;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
 import net.nurigo.java_sdk.exceptions.CoolsmsSDKException;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
@@ -105,6 +106,41 @@ public class GroupMessage extends Coolsms {
     }
 
     String resource = "groups/" + params.get("group_id") + "/add_messages";
+    return sendPostRequest(resource, params);
+  }
+
+  /**
+   * @brief add json type message to group ( HTTP Method POST )
+   * @param string group_id [required]
+   * @param JSONArray messages [required] [{
+   * @param string to [required]
+   * @param string from [required]
+   * @param string text [required]
+   * @param string image_id [optional]
+   * @param string refname [optional]
+   * @param string country [optional]
+   * @param string datetime [optional]
+   * @param string subject [optional]
+   * @param integer delay [optional] }]
+   * @return JSONObject
+   * @throws CoolsmsException
+   */
+  public JSONObject addMessagesJSON(String group_id, JSONArray messages) throws CoolsmsException {
+    if (!checkString(group_id) || messages.size() < 1) {
+      throw new CoolsmsSDKException("group_id, messages is required", 202);
+    }
+
+    JSONObject item = null;
+    for (int i = 0; i < messages.size(); i++) {
+      item = (JSONObject) messages.get(i);
+      if (!checkString(item.get("to").toString()) || !checkString(item.get("text").toString()) || !checkString(item.get("from").toString()))
+        throw new CoolsmsSDKException("to, from, text is required", 202);
+    }
+
+    HashMap<String, String> params = new HashMap<String, String>();
+    params.put("messages", messages.toString());
+
+    String resource = "groups/" + group_id + "/add_messages.json";
     return sendPostRequest(resource, params);
   }
 

@@ -26,13 +26,15 @@ public class ExampleAddMessages {
     params.put("group_id", "GID56FA3B1BF0826"); // Group ID	    
 
     // Optional parameters for your own needs
-    // params.put("type", "SMS"); // Message type ( SMS, LMS, MMs )
+    // params.put("type", "SMS"); // Message type ( SMS, LMS, MMS, ATA )
     // params.put("image_id", "image_id"); // image_id. type must be set as 'MMS'
     // params.put("refname", ""); // Reference name
     // params.put("country", "82"); // Korea(82) Japan(81) America(1) China(86) Default is Korea
     // params.put("datetime", "20140106153000"); // Format must be(YYYYMMDDHHMISS) 2014 01 06 15 30 00 (2014 Jan 06th 3pm 30 00)
     // params.put("subject", "Message Title"); // set msg title for LMS and MMS
     // params.put("delay", "10"); // '0~20' delay messages
+    // params.put("sender_key", "55540253a3e61072f57ed5d4cc2ecf965e15bb64"); // 알림톡 사용을 위해 필요합니다. 신청방법 : http://www.coolsms.co.kr/AboutAlimTalk
+    // params.put("template_code", "C004"); // 알림톡 template code 입니다. 자세한 설명은 http://www.coolsms.co.kr/AboutAlimTalk을 참조해주세요.
 
     try {
       JSONObject obj = (JSONObject) coolsms.addMessages(params);
