@@ -25,6 +25,11 @@ import org.json.simple.JSONValue;
 import org.junit.Test;
 
 /**
+ * Copyright (C) 2008-2016 NURIGO \n
+ * http://www.coolsms.co.kr
+ */
+
+/**
  * @mainpage JAVA SDK
  * @section intro 소개
  *     - 소개 : Coolsms REST API 
