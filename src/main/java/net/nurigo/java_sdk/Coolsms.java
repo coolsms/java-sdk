@@ -33,7 +33,7 @@ import org.junit.Test;
  * @mainpage JAVA SDK
  * @section intro 소개
  *     - 소개 : Coolsms REST API 
- *     - 버전 : 2.0
+ *     - 버전 : 2.2
  *     - 설명 : Coolsms REST API 를 이용 보다 빠르고 안전하게 문자메시지를 보낼 수 있는 JAVA로 만들어진 SDK 입니다.
  * @section CreateInfo 작성 정보
  *     - 작성자 : Nurigo
@@ -48,8 +48,8 @@ import org.junit.Test;
  */
 public class Coolsms {
   /** base resource url & sdk_version */
-  final String URL = "http://14.63.186.175";
-  final String SDK_VERSION = "2.0";
+  final String URL = "http://rest2.coolsms.co.kr";
+  final String SDK_VERSION = "2.2";
 
   /** api name & api version */
   private String apiName = "sms";

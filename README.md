@@ -10,17 +10,17 @@ Send Message & Message Management using JAVA and REST API.
 
   ```bash
   <dependency>
-      <groupId>net.nurigo</groupId>
-      <artifactId>javaSDK</artifactId>
-      <version>2.0</version>
+    <groupId>net.nurigo</groupId>
+    <artifactId>javaSDK</artifactId>
+    <version>2.2</version>
   </dependency>
   ```
 
 - Package install url ( library & examples ) : http://www.coolsms.co.kr/download/559455
 
-- Github : https://github.com/coolsms/java-sdk
+- Github : https://github.com/coolsms/java-sdk ( release v2.2 )
 
-## Optional
+## Requirements
 
 * Maven
 
