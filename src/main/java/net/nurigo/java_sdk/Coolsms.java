@@ -48,7 +48,7 @@ import org.junit.Test;
  */
 public class Coolsms {
   /** base resource url & sdk_version */
-  final String URL = "http://rest2.coolsms.co.kr";
+  final String URL = "https://api.coolsms.co.kr";
   final String SDK_VERSION = "2.2";
 
   /** api name & api version */
@@ -62,8 +62,7 @@ public class Coolsms {
   private String apiKey;
   private String apiSecret;
 
-  /** connection type & charset */
-  boolean useHttp = false;
+  // charset  
   String charset = "UTF-8";
 
   /**
@@ -113,8 +112,7 @@ public class Coolsms {
     try {
       // start https connection	
       URL url = new URL(getResourceUrl(resource));
-      //HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+      HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();      
       connection.setDoInput(true); // Server에서 온 데이터를 입력 받을 수 있도록			
       connection.setDoOutput(true); // Server에서 온 데이터를 출력 할수 있도록
       connection.setRequestMethod("POST");
@@ -213,7 +211,7 @@ public class Coolsms {
 
     try {
       URL url = new URL(data);
-      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+      HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
       String response = getHttpsResponse(connection);
 
