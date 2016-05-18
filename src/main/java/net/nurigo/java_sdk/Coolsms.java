@@ -108,11 +108,11 @@ public class Coolsms {
         continue;
       postDataBuilder = setPostData(postDataBuilder, key, value, delimiter);
     }
-    
+
     try {
       // start https connection	
       URL url = new URL(getResourceUrl(resource));
-      HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();      
+      HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
       connection.setDoInput(true); // Server에서 온 데이터를 입력 받을 수 있도록			
       connection.setDoOutput(true); // Server에서 온 데이터를 출력 할수 있도록
       connection.setRequestMethod("POST");
@@ -430,6 +430,8 @@ public class Coolsms {
    * @return boolean
    */
   public boolean checkString(String str) {
+    if (str == null)
+      return false;
     str = str.trim();
     if (str == null || str.isEmpty())
       return false;
