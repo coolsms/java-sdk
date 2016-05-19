@@ -21,7 +21,6 @@ public class ExampleSend {
     params.put("from", "01000000000"); // 발신번호
     params.put("type", "SMS"); // Message type ( SMS, LMS, MMS, ATA )
     params.put("text", "Test Message"); // 문자내용    
-    params.put("app_version", "JAVA SDK v1.2"); // application name and version
 
     // Optional parameters for your own needs
     // params.put("image", "desert.jpg"); // image for MMS. type must be set as "MMS"
