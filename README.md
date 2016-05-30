@@ -1,7 +1,5 @@
 # Coolsms JAVA SDK
 
-[![Latest Stable Version](https://poser.pugx.org/KnpLabs/packagist-api/v/stable.png)]
-
 Send Message & Message Management using JAVA and REST API.
 
 ## Installation
