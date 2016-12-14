@@ -24,4 +24,4 @@ Send Message & Message Management using JAVA and REST API.
 
 ## Usage
 
-Look at the 'http://www.coolsms.co.kr/JAVA_SDK_Examples'.
+Look at the 'http://www.coolsms.co.kr/JAVA_SDK_Example'.
