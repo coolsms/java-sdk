@@ -14,7 +14,7 @@ Send Message & Message Management using JAVA and REST API.
   </dependency>
   ```
 
-- Package install url ( library & examples ) : http://www.coolsms.co.kr/download/559455
+- Package install url ( library & examples ) : https://www.coolsms.co.kr/download/559455
 
 - Github : https://github.com/coolsms/java-sdk ( release v2.2 )
 
@@ -24,4 +24,4 @@ Send Message & Message Management using JAVA and REST API.
 
 ## Usage
 
-Look at the 'http://www.coolsms.co.kr/JAVA_SDK_Example'.
+Look at the 'https://www.coolsms.co.kr/JAVA_SDK_Example'.
