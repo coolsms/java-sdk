@@ -69,10 +69,10 @@ public class Message extends Coolsms {
   }
 
   /**
-   * @brief cancel reserve message. mid or gid either one must be entered. ( HTTP Method POST )
+   * @brief cancel reserve message. message_id or group_id either one must be entered. ( HTTP Method POST )
    * @param hashmap<string, string> params {
-   * @param string mid [optional]
-   * @param string gid [optional] }
+   * @param string message_id [optional]
+   * @param string group_id [optional] }
    * @return None
    * @throws CoolsmsException
    */
