@@ -25,7 +25,7 @@ import org.json.simple.JSONValue;
 import org.junit.Test;
 
 /**
- * Copyright (C) 2008-2016 NURIGO \n
+ * Copyright (C) 2008-2018 NURIGO \n
  * http://www.coolsms.co.kr
  */
 

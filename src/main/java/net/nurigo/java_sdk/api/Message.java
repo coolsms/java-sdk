@@ -69,16 +69,16 @@ public class Message extends Coolsms {
   }
 
   /**
-   * @brief cancel reserve message. mid or gid either one must be entered. ( HTTP Method POST )
+   * @brief cancel reserve message. message_id or group_id either one must be entered. ( HTTP Method POST )
    * @param hashmap<string, string> params {
-   * @param string mid [optional]
-   * @param string gid [optional] }
+   * @param string message_id [optional]
+   * @param string group_id [optional] }
    * @return None
    * @throws CoolsmsException
    */
   public JSONObject cancel(HashMap<String, String> params) throws CoolsmsException {
-    if (!checkString(params.get("mid")) && !checkString(params.get("gid")))
-      throw new CoolsmsSDKException("mid or gid either one must be entered", 202);
+    if (!checkString(params.get("message_id")) && !checkString(params.get("group_id")))
+      throw new CoolsmsSDKException("message_id or group_id either one must be entered", 202);
 
     return sendPostRequest("cancel", params);
   }
